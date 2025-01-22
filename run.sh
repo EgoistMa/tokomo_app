@@ -9,8 +9,15 @@ show_usage() {
     echo "  command: build 或 dev"
     echo "  target: frontend 或 backend"
     echo ""
+    echo "重要说明:"
+    echo "  1. 后端首次运行开发环境必须先使用此脚本执行 dev"
+    echo "  2. 构建项目时必须使用此脚本执行 build 命令"
+    echo "  3. 只有前后端都完成 build 后，才能执行 pnpm run start"
+    echo ""
     echo "例子:"
     echo "  ./run.sh build frontend  # 构建前端"
+    echo "  ./run.sh build backend   # 构建后端"
+    echo "  ./run.sh dev frontend    # 开发前端"
     echo "  ./run.sh dev backend     # 开发后端"
 }
 
