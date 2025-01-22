@@ -58,4 +58,4 @@ apps/tokomo_BE/target/
 *.log
 
 # turbo
-.turbo
+.turbo/
