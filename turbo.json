@@ -10,9 +10,12 @@
       },
       "dev": {
         "cache": false,
+        "persistent": true
+      },
+      "start": {
+        "cache": false,
         "persistent": true,
-        "dependsOn": [],
-        "outputs": []
+        "dependsOn": ["^build"]
       },
       "lint": {
         "outputs": []

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { GameDetailCard } from '@/components/GameDetailCard';
@@ -31,7 +31,7 @@ interface GameResponse {
   remainingPoints: number;
 }
 
-export default function ResultPage() {
+function SearchResults() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [searchResult, setSearchResult] = useState<SearchResult>({
@@ -243,5 +243,17 @@ export default function ResultPage() {
         }}
       />
     </div>
+  );
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">加载中...</div>
+      </div>
+    }>
+      <SearchResults />
+    </Suspense>
   );
 } 
