@@ -56,3 +56,6 @@ next-env.d.ts
 # JAVA project
 apps/tokomo_BE/target/
 *.log
+
+# turbo
+.turbo
