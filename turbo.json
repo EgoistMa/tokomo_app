@@ -1,0 +1,22 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+    "tasks": {
+      "build": {
+        "dependsOn": ["^build"],
+        "outputs": [
+          "apps/tokomo_FE/.next/**",
+          "apps/tokomo_BE/target/**"
+        ]
+      },
+      "dev": {
+        "cache": false,
+        "persistent": true,
+        "dependsOn": [],
+        "outputs": []
+      },
+      "lint": {
+        "outputs": []
+      }
+    },
+    "ui":"tui"
+  }

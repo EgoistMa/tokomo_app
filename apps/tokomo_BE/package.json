@@ -1,0 +1,10 @@
+{
+    "name": "tokomo_BE",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "mvn spring-boot:run",
+        "build": "mvn clean package -DskipTests",
+        "start": "java -jar target/tokomoapp-backend-0.0.1-SNAPSHOT.jar"
+    }
+}
