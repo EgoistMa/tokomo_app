@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.tokomoapp.tokomoappbackend.model.ApiResponse;
 import org.tokomoapp.tokomoappbackend.model.Game;
 import org.tokomoapp.tokomoappbackend.model.User;
+import org.tokomoapp.tokomoappbackend.model.UserGame;
+import org.tokomoapp.tokomoappbackend.repository.UserGameRepository;
 import org.tokomoapp.tokomoappbackend.service.GameService;
 import org.tokomoapp.tokomoappbackend.service.UserService;
 
@@ -27,6 +29,9 @@ public class GameController {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private UserGameRepository userGameRepository;
+    
     @Value("${game.cost}")
     private Integer gameCost;
     
@@ -42,6 +47,50 @@ public class GameController {
         }
     }
     
+    // purchase game
+
+    @PostMapping("/purchase")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse> purchaseGame(
+            @RequestBody Map<String, String> request,
+            @AuthenticationPrincipal Long userId) {
+        try {
+            String gameId = request.get("gameId");
+            if (gameId == null) {
+                return ResponseEntity.badRequest()
+                    .body(new ApiResponse("error", "Game ID is required"));
+            }
+
+            User user = userService.getUserById(userId);
+            Game game = gameService.getGameById(gameId)
+                .orElseThrow(() -> new RuntimeException("Game not found with id: " + gameId));
+
+            // 检查用户是否已经购买过该游戏
+            if (userGameRepository.existsByUserIdAndGameId(userId, gameId)) {
+                return ResponseEntity.badRequest()
+                    .body(new ApiResponse("error", "You already own this game"));
+            }
+
+            // 非VIP用户需要扣除积分
+            if (!user.isVIP()) {
+                user = userService.deductPoints(userId, gameCost);
+            }
+
+            // 保存购买记录
+            UserGame userGame = new UserGame(user, game);
+            userGameRepository.save(userGame);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("game", game);
+            response.put("remainingPoints", user.getPoints());
+            
+            return ResponseEntity.ok(new ApiResponse("ok", "Game purchased successfully", response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("error", "Error purchasing game: " + e.getMessage()));
+        }
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse> getGame(
@@ -52,24 +101,17 @@ public class GameController {
             Game game = gameService.getGameById(id)
                 .orElseThrow(() -> new RuntimeException("Game not found with id: " + id));
 
-            if (user.isVIP()) {
-                // VIP用户直接获取游戏信息
+            // 检查用户是否已购买游戏或是VIP
+            boolean hasAccess = user.isVIP() || userGameRepository.existsByUserIdAndGameId(userId, id);
+
+            if (hasAccess) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("game", game);
                 response.put("remainingPoints", user.getPoints());
                 return ResponseEntity.ok(new ApiResponse("ok", "Game fetched successfully", response));
             } else {
-                // 非VIP用户需要扣除积分
-                try {
-                    user = userService.deductPoints(userId, gameCost);
-                    Map<String, Object> response = new HashMap<>();
-                    response.put("game", game);
-                    response.put("remainingPoints", user.getPoints());
-                    return ResponseEntity.ok(new ApiResponse("ok", "Game fetched successfully", response));
-                } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(new ApiResponse("error", "Insufficient points. Required: " + gameCost));
-                }
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponse("error", "Please purchase the game first. Required points: " + gameCost));
             }
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
@@ -77,6 +119,23 @@ public class GameController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse("error", "Error fetching game: " + e.getMessage()));
+        }
+    }
+
+    // 添加新接口：获取用户购买的所有游戏
+    @GetMapping("/purchased")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse> getPurchasedGames(@AuthenticationPrincipal Long userId) {
+        try {
+            List<UserGame> userGames = userGameRepository.findByUserId(userId);
+            List<Game> games = userGames.stream()
+                .map(UserGame::getGame)
+                .toList();
+            
+            return ResponseEntity.ok(new ApiResponse("ok", "Purchased games fetched successfully", games));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("error", "Error fetching purchased games: " + e.getMessage()));
         }
     }
 
