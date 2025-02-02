@@ -6,6 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.tokomoapp.tokomoappbackend.model.VipCode;
 import org.tokomoapp.tokomoappbackend.repository.VipCodeRepository;
+import org.tokomoapp.tokomoappbackend.model.PaymentCode;
+import org.tokomoapp.tokomoappbackend.repository.PaymentCodeRepository;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -16,6 +18,9 @@ public class TokomoappBackendApplication implements CommandLineRunner {
 
     @Autowired
     private VipCodeRepository vipCodeRepository;
+    
+    @Autowired
+    private PaymentCodeRepository paymentCodeRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(TokomoappBackendApplication.class, args);
@@ -72,6 +77,27 @@ public class TokomoappBackendApplication implements CommandLineRunner {
                         } catch (Exception e) {
                             System.out.println("Error parsing time format: " + e.getMessage());
                         }
+                    } else if (command.startsWith("genpay ")) {
+                        try {
+                            int points = Integer.parseInt(command.substring(7));
+                            if (points > 0) {
+                                // 生成充值码
+                                String code = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                                PaymentCode paymentCode = new PaymentCode();
+                                paymentCode.setCode(code);
+                                paymentCode.setPoints(points);
+                                paymentCode.setUsed(false);
+                                
+                                paymentCodeRepository.save(paymentCode);
+                                System.out.println("Generated payment code: " + code + " (Points: " + points + ")");
+                            } else {
+                                System.out.println("Points must be greater than 0");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid points format. Please enter a number");
+                        } catch (Exception e) {
+                            System.out.println("Error generating payment code: " + e.getMessage());
+                        }
                     } else {
                         switch (command.toLowerCase()) {
                             case "reload" -> System.out.println("reloaded!");
@@ -86,6 +112,8 @@ public class TokomoappBackendApplication implements CommandLineRunner {
                                 System.out.println("  genvip <time>: generate a VIP code valid for specified time");
                                 System.out.println("    time format: combination of y(years), m(months), w(weeks), d(days)");
                                 System.out.println("    example: genvip 1y2m3w4d = 1 year 2 months 3 weeks 4 days");
+                                System.out.println("  genpay <points>: generate a payment code for specified points");
+                                System.out.println("    example: genpay 100");
                             }
                             default -> System.out.println("unknown command, type \"help\" for more information");
                         }

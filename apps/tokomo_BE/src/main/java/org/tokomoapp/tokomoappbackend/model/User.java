@@ -23,10 +23,13 @@ public class User {
     @Column(nullable = false)
     private String hashedPassword;
     
-    @Column(name = "security_question_id")
-    private Long securityQuestionId;
+    @Column(name = "security_question", nullable = false)
+    private String securityQuestion;
     
-    @Column(name = "Points")
+    @Column(name = "security_answer", nullable = false)
+    private String securityAnswer;
+    
+    @Column(name = "points")
     private Integer points;
 
     @Column(name = "vip_expire_date")
@@ -45,11 +48,11 @@ public class User {
     private Boolean isActive;
     
 
-    public User(Long id, String username, String hashedPassword, Long securityQuestionId) {
-        this.id = id;
+    public User(String username, String hashedPassword, String securityQuestion, String securityAnswer) {
         this.username = username;
         this.hashedPassword = hashedPassword;
-        this.securityQuestionId = securityQuestionId;
+        this.securityQuestion = securityQuestion;
+        this.securityAnswer = securityAnswer;
         this.points = 0;
         this.isAdmin = false;
         this.createdAt = LocalDateTime.now();
@@ -67,7 +70,7 @@ public class User {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", hashedPassword='" + "********" + '\'' +
-                ", securityQuestionId=" + securityQuestionId +
+                ", securityQuestion='" + securityQuestion + '\'' +
                 '}';
     }
 
@@ -81,8 +84,9 @@ public class User {
         sanitizedUser.setCreatedAt(this.getCreatedAt());
         sanitizedUser.setLastLoginAt(this.getLastLoginAt());
         sanitizedUser.setIsActive(this.getIsActive());
-        sanitizedUser.setSecurityQuestionId(this.getSecurityQuestionId());
+        sanitizedUser.setSecurityQuestion(this.getSecurityQuestion());
         sanitizedUser.setHashedPassword("********");
+        sanitizedUser.setSecurityAnswer("********");
         return sanitizedUser;
     }
 }

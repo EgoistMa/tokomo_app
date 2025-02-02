@@ -6,14 +6,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.tokomoapp.tokomoappbackend.model.ApiResponse;
-import org.tokomoapp.tokomoappbackend.model.Transaction;
+import org.tokomoapp.tokomoappbackend.model.PaymentCode;
+import org.tokomoapp.tokomoappbackend.service.PaymentService;
 import org.tokomoapp.tokomoappbackend.service.UserService;
 import org.tokomoapp.tokomoappbackend.exception.UserAlreadyExistsException;
 import org.tokomoapp.tokomoappbackend.util.JwtUtil;
 import org.tokomoapp.tokomoappbackend.model.User;
 import java.util.List;
 import java.util.Map;
-import org.tokomoapp.tokomoappbackend.service.TransactionService;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.tokomoapp.tokomoappbackend.exception.InvalidVipCodeException;
@@ -25,12 +27,12 @@ public class UserController {
     
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PaymentService paymentService;
     
     @Autowired
     private JwtUtil jwtUtil;
-    
-    @Autowired
-    private TransactionService transactionService;
     
     @Value("${game.cost}")
     private Integer GameCost;
@@ -40,47 +42,19 @@ public class UserController {
         try {
             String username = request.get("username");
             String password = request.get("password");
-            String question = request.get("question");
-            String answer = request.get("answer");
-            String vipCode = request.get("vipCode");  // 可选的VIP码
-            
-            if (username == null || password == null || question == null || answer == null) {
-                return ResponseEntity.badRequest()
-                    .body(new ApiResponse("error", "Username, password, security question and answer are required"));
-            }
-            
-            User user = userService.registerUser(username, password, question, answer, vipCode);
-            
-            try {
-                String token = jwtUtil.generateToken(user);
-                Map<String, Object> data = new HashMap<>();
-                data.put("token", token);
-                
-                return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse("ok", "Registration successful", data));
-            } catch (Exception e) {
-                System.out.println("Error generating token: " + e.getMessage());
-                e.printStackTrace();
-                
-                // 即使token生成失败，注册仍然是成功的
-                Map<String, Object> data = new HashMap<>();
-                data.put("userId", user.getId());
-                data.put("vipExpireDate", user.getVipExpireDate());
-                
-                return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse("ok", "Registration successful but token generation failed", data));
-            }
-                    
+            String securityQuestion = request.get("securityQuestion");
+            String securityAnswer = request.get("securityAnswer");
+
+            User user = userService.registerUser(username, password, securityQuestion, securityAnswer);
+            return ResponseEntity.ok(new ApiResponse("ok", "Registration successful", user.sanitize()));
         } catch (UserAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ApiResponse("error", e.getMessage()));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse("error", e.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse("error", "Registration failed: " + e.getMessage()));
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("error", "Registration failed"));
         }
     }
     
@@ -144,7 +118,39 @@ public class UserController {
         }
     }
 
+    @PostMapping("/redeem-payment")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse> redeemPaymentCode(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Map<String, String> request) {
+        try {
+            String token = authHeader.substring(7);
+            Long userId = jwtUtil.extractUserId(token);
+            
+            String code = request.get("code");
+            if (code == null || code.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(new ApiResponse("error", "Payment code is required"));
+            }
+            
+            User user = userService.getUserById(userId);
+            PaymentCode paymentCode = paymentService.redeemCode(userId, code);
+            
+            return ResponseEntity.ok(new ApiResponse("ok", "Payment successful", 
+                Map.of("points", paymentCode.getPoints(),
+                       "totalPoints", user.getPoints())));
+                
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                .body(new ApiResponse("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("error", "System error: " + e.getMessage()));
+        }
+    }
+    
     @GetMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse> getUserProfile(
             @RequestHeader("Authorization") String authHeader) {
         try {
@@ -163,8 +169,9 @@ public class UserController {
             User user = userService.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
             
-            // 获取用户的所有交易记录
-            List<Transaction> transactions = transactionService.findByUserId(userId);
+            // TODO: 获取用户的所有交易记录
+            //List<Transaction> transactions = transactionService.findByUserId(userId);
+            List<Integer> transactions = new ArrayList<>();
             
             Map<String, Object> userInfo = new HashMap<>();
             userInfo.put("id", user.getId());
@@ -176,7 +183,7 @@ public class UserController {
             userInfo.put("createdAt", user.getCreatedAt());
             userInfo.put("lastLoginAt", user.getLastLoginAt());
             userInfo.put("isActive", user.getIsActive());
-            userInfo.put("transactions", transactions);
+            userInfo.put("transactions", transactions); // TODO: 获取用户的所有交易记录
             
             return ResponseEntity.ok(new ApiResponse("ok", "User profile retrieved", userInfo));
                 
@@ -186,29 +193,15 @@ public class UserController {
         }
     }
 
-    @PostMapping("/password/security-question")
-    public ResponseEntity<ApiResponse> getSecurityQuestion(@RequestBody Map<String, String> request) {
+    @GetMapping("/password/security-question")
+    public ResponseEntity<ApiResponse> getSecurityQuestion(@RequestParam String username) {
         try {
-            String username = request.get("username");
-            if (username == null) {
-                return ResponseEntity.badRequest()
-                    .body(new ApiResponse("error", "Username is required"));
-            }
-
-            User user = userService.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-            
-            SecurityQuestion securityQuestion = userService.getSecurityQuestion(user.getSecurityQuestionId());
-            
-            return ResponseEntity.ok(new ApiResponse("ok", "Security question fetched", 
-                Map.of("question", securityQuestion.getQuestion())));
-                
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest()
-                .body(new ApiResponse("error", e.getMessage()));
+            String question = userService.getSecurityQuestion(username);
+            return ResponseEntity.ok(new ApiResponse("ok", "Success", question));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse("error", "Error fetching security question: " + e.getMessage()));
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse("error", e.getMessage()));
         }
     }
 
@@ -216,24 +209,33 @@ public class UserController {
     public ResponseEntity<ApiResponse> resetPassword(@RequestBody Map<String, String> request) {
         try {
             String username = request.get("username");
-            String answer = request.get("answer");
+            String securityAnswer = request.get("securityAnswer");
             String newPassword = request.get("newPassword");
-            
-            if (username == null || answer == null || newPassword == null) {
-                return ResponseEntity.badRequest()
-                    .body(new ApiResponse("error", "Username, answer and new password are required"));
-            }
 
-            userService.resetPassword(username, answer, newPassword);
-            
-            return ResponseEntity.ok(new ApiResponse("ok", "Password reset successfully"));
-                
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest()
+            String result = userService.resetPassword(username, securityAnswer, newPassword);
+            return ResponseEntity.ok(new ApiResponse("ok", result));
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/payment-history")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse> getPaymentHistory(
+            @RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.substring(7);
+            Long userId = jwtUtil.extractUserId(token);
+            
+            List<PaymentCode> paymentHistory = paymentService.getPaymentHistory(userId);
+            
+            return ResponseEntity.ok(new ApiResponse("ok", "Payment history retrieved", paymentHistory));
+                
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse("error", "Error resetting password: " + e.getMessage()));
+                .body(new ApiResponse("error", "Error retrieving payment history: " + e.getMessage()));
         }
     }
 } 

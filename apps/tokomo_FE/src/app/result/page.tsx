@@ -125,6 +125,8 @@ function SearchResults() {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
+      
+      // 先尝试获取游戏详情
       const response = await fetch(`/api/games/${gameId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -132,34 +134,57 @@ function SearchResults() {
       });
 
       const data = await response.json();
-      console.log('API Response:', data);
-
-      if (response.status === 200 && data.status === 'ok') {
-        const gameDetail: GameResponse = data.data;
-        console.log('Game Detail:', gameDetail);
-        
-        if (gameDetail && gameDetail.game) {
-          setSelectedGame(gameDetail.game);
-          setSearchResult(prev => ({
-            ...prev,
-            remainingPoints: gameDetail.remainingPoints
-          }));
-          setShowDetail(true);
-        } else {
-          showToast('游戏详情数据不完整', 'error');
+      
+      if (response.status === 403) {
+        // 需要购买游戏
+        try {
+          const purchaseResponse = await fetch('/api/games/purchase', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ gameId })
+          });
+          
+          const purchaseData = await purchaseResponse.json();
+          
+          if (purchaseResponse.status === 200 && purchaseData.status === 'ok') {
+            // 购买成功,显示游戏详情
+            const gameDetail: GameResponse = purchaseData.data;
+            setSelectedGame(gameDetail.game);
+            setSearchResult(prev => ({
+              ...prev,
+              remainingPoints: gameDetail.remainingPoints
+            }));
+            setShowDetail(true);
+          } else if (purchaseData.message.includes('Insufficient points')) {
+            const requiredPoints = purchaseData.message.match(/Required: (\d+)/)?.[1];
+            const message = requiredPoints 
+              ? `积分不足，需要${requiredPoints}积分。请充值或开通VIP来领取愿望！`
+              : '积分不足，请充值或开通VIP来领取愿望！';
+            showToast(message, 'warning');
+          } else {
+            showToast(purchaseData.message || '购买游戏失败', 'error');
+          }
+        } catch (error) {
+          console.error('购买游戏失败:', error);
+          showToast('购买游戏失败，请稍后重试', 'error');
         }
-      } else if (data.status === 'error' && data.message.includes('Insufficient points')) {
-        const requiredPoints = data.message.match(/Required: (\d+)/)?.[1];
-        const message = requiredPoints 
-          ? `积分不足，需要${requiredPoints}积分。请充值或开通VIP来领取愿望！`
-          : '积分不足，请充值或开通VIP来领取愿望！';
-        
-        showToast(message, 'warning');
+      } else if (response.status === 200 && data.status === 'ok') {
+        // 已经购买过,直接显示详情
+        const gameDetail: GameResponse = data.data;
+        setSelectedGame(gameDetail.game);
+        setSearchResult(prev => ({
+          ...prev,
+          remainingPoints: gameDetail.remainingPoints
+        }));
+        setShowDetail(true);
       } else {
-        showToast('获取游戏详情失败', 'error');
+        showToast(data.message || '获取游戏详情失败', 'error');
       }
     } catch (error) {
-      console.error('获取游戏详情错误:', error);
+      console.error('操作失败:', error);
       showToast('系统错误，请稍后重试', 'error');
     } finally {
       setIsLoading(false);
@@ -220,7 +245,7 @@ function SearchResults() {
                 className={`ml-4 px-4 py-2 bg-blue-500 text-white rounded-md transition-colors
                   ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
               >
-                {isLoading ? '加载中...' : '领取愿望(花费80许愿币)'}
+                {isLoading ? '处理中...' : '领取愿望(如未购买需要80许愿币)'}
               </button>
             </div>
           ))}
@@ -235,7 +260,7 @@ function SearchResults() {
 
       {/* 添加游戏详情卡片 */}
       <GameDetailCard
-        game={selectedGame}
+        game={selectedGame ? {...selectedGame, remark: ''} : null}
         visible={showDetail}
         onClose={() => {
           setShowDetail(false);

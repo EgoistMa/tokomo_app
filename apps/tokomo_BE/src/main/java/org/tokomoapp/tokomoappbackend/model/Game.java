@@ -14,12 +14,14 @@ public class Game {
     private String downloadUrl;
     private String password;
     private String extractPassword;
+    private String remark;
 
     public Game sanitize() {
         Game sanitizedGame = new Game();
         sanitizedGame.setId(this.getId());
         sanitizedGame.setGameType(this.getGameType());
         sanitizedGame.setGameName(this.getGameName());
+        sanitizedGame.setRemark(this.getRemark());
         return sanitizedGame;
     }
 } 

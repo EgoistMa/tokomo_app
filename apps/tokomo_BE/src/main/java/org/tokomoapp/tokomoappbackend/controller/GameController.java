@@ -21,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/games")
+@PreAuthorize("isAuthenticated()")
 public class GameController {
     
     @Autowired
@@ -36,7 +37,7 @@ public class GameController {
     private Integer gameCost;
     
     @GetMapping("/search")
-    @PreAuthorize("isAuthenticated()")
+
     public ResponseEntity<ApiResponse> searchGames(@RequestParam String keyword) {
         try {
             List<Game> games = gameService.searchGames(keyword);
@@ -46,11 +47,8 @@ public class GameController {
                 .body(new ApiResponse("error", "Error searching games: " + e.getMessage()));
         }
     }
-    
-    // purchase game
 
     @PostMapping("/purchase")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse> purchaseGame(
             @RequestBody Map<String, String> request,
             @AuthenticationPrincipal Long userId) {
@@ -92,7 +90,6 @@ public class GameController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse> getGame(
             @PathVariable String id,
             @AuthenticationPrincipal Long userId) {
@@ -124,7 +121,6 @@ public class GameController {
 
     // 添加新接口：获取用户购买的所有游戏
     @GetMapping("/purchased")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse> getPurchasedGames(@AuthenticationPrincipal Long userId) {
         try {
             List<UserGame> userGames = userGameRepository.findByUserId(userId);

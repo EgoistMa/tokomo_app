@@ -40,9 +40,19 @@ export default function Home() {
             });
           } else {
             console.error('获取用户资料失败:', response.message);
+            // 获取失败时登出用户
+            localStorage.removeItem('token');
+            setIsLoggedIn(false);
+            setUsername('');
+            setUserProfile(null);
           }
         } catch (error) {
           console.error('获取用户资料失败:', error);
+          // 发生错误时也登出用户
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          setUsername('');
+          setUserProfile(null);
         }
       };
 

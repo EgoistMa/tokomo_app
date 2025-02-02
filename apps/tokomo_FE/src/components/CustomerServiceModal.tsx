@@ -1,3 +1,6 @@
+import { siteConfig } from "@/config/site";
+import Image from "next/image";
+
 interface CustomerServiceModalProps {
   visible: boolean;
   onClose: () => void;
@@ -5,23 +8,30 @@ interface CustomerServiceModalProps {
 
 export function CustomerServiceModal({ visible, onClose }: CustomerServiceModalProps) {
   if (!visible) return null;
+  
+  const { title, qq, qrCode } = siteConfig.customerService;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">联系客服</h3>
+          <h3 className="text-xl font-semibold">{title}</h3>
         </div>
         
         <div className="space-y-4">
-          {/* 模拟二维码 */}
-          <div className="w-48 h-48 mx-auto bg-gray-200 flex items-center justify-center">
-            <div className="w-32 h-32 bg-gray-400"></div>
+          {/* 二维码图片 */}
+          <div className={`${qrCode.width} ${qrCode.height} mx-auto relative`}>
+            <Image
+              src={qrCode.url}
+              alt="客服二维码"
+              fill
+              className="object-contain"
+            />
           </div>
           
           {/* QQ号 */}
           <div className="text-center text-gray-700">
-            QQ号：12345678
+            {qq.label}{qq.number}
           </div>
         </div>
 

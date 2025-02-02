@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.tokomoapp.tokomoappbackend.service.UserService;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.Arrays;
 
@@ -29,7 +30,11 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final UserService userService;
 
-    public SecurityConfig(JwtUtil jwtUtil, ObjectMapper objectMapper, UserService userService) {
+    public SecurityConfig(
+        JwtUtil jwtUtil, 
+        ObjectMapper objectMapper, 
+        @Lazy UserService userService
+    ) {
         this.jwtUtil = jwtUtil;
         this.objectMapper = objectMapper;
         this.userService = userService;

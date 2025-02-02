@@ -1,16 +1,17 @@
 import { showToast } from '@/components/Toast';
 
-interface GameDetail {
+interface Game {
   id: string;
-  gameType: string | null;
   gameName: string;
+  gameType: string | null;
   downloadUrl: string | null;
   password: string | null;
   extractPassword: string | null;
+  remark?: string;
 }
 
 interface GameDetailCardProps {
-  game: GameDetail | null;
+  game: Game | null;
   onClose: () => void;
   visible: boolean;
 }
@@ -90,6 +91,10 @@ export function GameDetailCard({ game, onClose, visible }: GameDetailCardProps) 
               复制
             </button>
           </div>
+          <div>
+            <span className="font-medium">备注：</span>
+            <span>{game.remark || '无备注'}</span>
+          </div>
         </div>
 
         <div className="mt-6 flex justify-end">
@@ -97,7 +102,7 @@ export function GameDetailCard({ game, onClose, visible }: GameDetailCardProps) 
             onClick={onClose}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
           >
-            关闭(非vip用户关闭后需要重新付费)
+            关闭
           </button>
         </div>
       </div>

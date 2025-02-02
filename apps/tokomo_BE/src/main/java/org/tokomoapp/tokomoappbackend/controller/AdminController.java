@@ -11,13 +11,16 @@ import org.tokomoapp.tokomoappbackend.model.VipCode;
 import org.tokomoapp.tokomoappbackend.service.UserService;
 import org.tokomoapp.tokomoappbackend.model.User;
 import org.tokomoapp.tokomoappbackend.model.Game;
+import org.tokomoapp.tokomoappbackend.model.PaymentCode;
 import org.tokomoapp.tokomoappbackend.service.GameService;
+import org.tokomoapp.tokomoappbackend.service.PaymentService;
 import org.tokomoapp.tokomoappbackend.util.ExcelGameReader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -30,7 +33,11 @@ public class AdminController {
     @Autowired
     private GameService gameService;
 
-    @PostMapping("/vip/generate")
+    @Autowired
+    private PaymentService paymentService;
+
+
+    @PostMapping("/vip/genVip")
     public ResponseEntity<ApiResponse> generateVipCodes(@RequestBody Map<String, Object> request) {
         try {
             int amount = request.get("amount") != null ? 
@@ -46,6 +53,35 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/payment/genPay")
+    public ResponseEntity<ApiResponse> generatePaymentCode(@RequestBody Map<String, Integer> request) {
+        try {
+            Integer points = request.get("points");
+            Integer amount = request.get("amount");
+            
+            if (points == null || points <= 0) {
+                return ResponseEntity.badRequest()
+                    .body(new ApiResponse("error", "Valid points amount is required"));
+            }
+            
+            if (amount == null || amount <= 0) {
+                amount = 1;
+            }
+            
+            List<PaymentCode> codes = new ArrayList<>();
+            for (int i = 0; i < amount; i++) {
+                codes.add(paymentService.generateCode(points));
+            }
+            
+            return ResponseEntity.ok(new ApiResponse("ok", "Payment codes generated successfully", 
+                Map.of("codes", codes)));
+                
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("error", "Error generating payment codes: " + e.getMessage()));
         }
     }
 
@@ -74,19 +110,30 @@ public class AdminController {
         }
     }
 
-    @PutMapping("/users/{userId}")
-    public ResponseEntity<ApiResponse> updateUser(
-            @PathVariable Long userId,
-            @RequestBody Map<String, Object> updates) {
+    @PutMapping("/users/{id}")
+    public ResponseEntity<ApiResponse> updateUser(@PathVariable Long id, @RequestBody User updates) {
         try {
-            User user = userService.updateUser(userId, updates);
-            return ResponseEntity.ok(new ApiResponse("ok", "User updated successfully", user));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest()
-                .body(new ApiResponse("error", e.getMessage()));
+            User updatedUser = userService.updateUser(id, updates);
+            return ResponseEntity.ok(new ApiResponse("ok", "User updated successfully", updatedUser.sanitize()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse("error", "Error updating user: " + e.getMessage()));
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/users/{id}/status")
+    public ResponseEntity<ApiResponse> updateUserStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> request) {
+        try {
+            boolean isActive = request.get("isActive");
+            userService.updateUserStatus(id, isActive);
+            return ResponseEntity.ok(new ApiResponse("ok", "User status updated successfully"));
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse("error", e.getMessage()));
         }
     }
 

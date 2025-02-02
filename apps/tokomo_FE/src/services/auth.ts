@@ -218,4 +218,21 @@ export const authService = {
       throw error;
     }
   },
+
+  async redeemPayment(code: string) {
+    const response = await fetch('/api/user/redeem-payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ code })
+    });
+
+    if (!response.ok) {
+      throw new Error('充值失败');
+    }
+
+    return response.json();
+  }
 }; 
