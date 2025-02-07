@@ -1,9 +1,13 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth';
 import Link from 'next/link';
 import { GameDetailCard } from '@/components/GameDetailCard';
+import Image from 'next/image';
+import { siteConfig } from "@/config/site";
+
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 interface Game {
   id: string;
@@ -27,36 +31,6 @@ interface UserProfileData {
   purchasedGames: Game[];
 }
 
-interface PaymentResponse {
-  status: string;
-  message: string;
-  data: {
-    transaction: {
-      transactionId: number;
-      type: string;
-      amount: number;
-      fromUser: number;
-      externalTransactionKey: string;
-      createdAt: string;
-      status: string;
-    }
-  }
-}
-
-interface ResolveResponse {
-  status: string;
-  message: string;
-  data: {
-    transactionId: number;
-    type: string;
-    amount: number;
-    fromUser: number;
-    externalTransactionKey: string;
-    createdAt: string;
-    status: string;
-  }
-}
-
 // 添加充值历史接口
 interface PaymentHistory {
   id: string;
@@ -65,15 +39,21 @@ interface PaymentHistory {
   usedAt: string;
 }
 
+// 添加 Purchase 接口定义
+interface Purchase {
+  id: number;
+  userId: number;
+  game: Game;
+  purchaseDate: string;
+}
+
+// 定义平台类型
+type Platform = 'xhs' | 'tb' | 'xy';
+
 export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showQRCode, setShowQRCode] = useState(false);
-  const [depositStatus, setDepositStatus] = useState<'idle' | 'loading' | 'pending' | 'success' | 'error'>('idle');
-  const [depositMessage, setDepositMessage] = useState('');
-  const [amount, setAmount] = useState<number>(100);
-  const [currentTransaction, setCurrentTransaction] = useState<string>('');
   const [vipCode, setVipCode] = useState('');
   const [redeemStatus, setRedeemStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [redeemMessage, setRedeemMessage] = useState('');
@@ -83,19 +63,17 @@ export default function ProfilePage() {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showGameDetail, setShowGameDetail] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
+  const [showPurchaseGuide, setShowPurchaseGuide] = useState(false);
+  const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-      return;
-    }
+  // 使用配置中的平台和步骤
+  const platforms = siteConfig.purchaseGuide.platforms.map(platform => ({
+    ...platform,
+  }));
+  
+  const platformSteps = siteConfig.purchaseGuide.steps;
 
-    loadProfile();
-    loadPaymentHistory();
-  }, [router]);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       const response = await authService.getProfile();
       setProfile(response.data);
@@ -105,18 +83,38 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    loadProfile();
+    loadPurchaseHistory();
+    loadPaymentHistory();
+  }, [router, loadProfile]);
 
   const loadPurchaseHistory = async () => {
     try {
-      const response = await fetch('/api/games/purchased', {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch(`${baseUrl}/api/user/purchase-history`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
       const data = await response.json();
       if (data.status === 'ok') {
-        setProfile(prev => prev ? { ...prev, purchasedGames: data.data } : null);
+        const games = data.data.map((purchase: Purchase) => ({
+          ...purchase.game,
+          createdAt: purchase.purchaseDate
+        }));
+        setProfile(prev => prev ? { ...prev, purchasedGames: games } : null);
       }
     } catch (error) {
       console.error('获取购买历史失败:', error);
@@ -136,74 +134,6 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error('获取充值历史失败:', error);
-    }
-  };
-
-  const handleDeposit = async () => {
-    try {
-      setDepositStatus('loading');
-      const response = await fetch('/api/payment/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ amount })
-      });
-
-      const data: PaymentResponse = await response.json();
-      if (response.status === 200 && data.status === 'ok') {
-        setCurrentTransaction(data.data.transaction.externalTransactionKey);
-        setDepositStatus('pending');
-        setDepositMessage('请扫描二维码完成支付');
-        setShowQRCode(true);
-      } else {
-        throw new Error(data.message || '创建支付订单失败');
-      }
-    } catch (err) {
-      console.error('创建充值订单失败:', err);
-      setDepositStatus('error');
-      setDepositMessage('创建充值订单失败，请稍后重试');
-    }
-  };
-
-  const handlePaymentComplete = async () => {
-    if (!currentTransaction) return;
-    
-    try {
-      setDepositStatus('loading');
-      const response = await fetch('/api/payment/resolve', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          externalTransactionKey: currentTransaction,
-          resolveType: 'success'
-        })
-      });
-
-      const data: ResolveResponse = await response.json();
-      if (response.status === 200 && data.status === 'ok' && data.data.status === 'COMPLETED') {
-        setDepositStatus('success');
-        setDepositMessage('充值成功！');
-        
-        // 1秒后刷新用户资料并关闭弹窗
-        setTimeout(() => {
-          loadProfile();
-          setShowQRCode(false);
-          setDepositStatus('idle');
-          setDepositMessage('');
-          setCurrentTransaction('');
-        }, 1000);
-      } else {
-        throw new Error(data.message || '支付确认失败');
-      }
-    } catch (err) {
-      console.error('支付确认失败:', err);
-      setDepositStatus('error');
-      setDepositMessage('支付确认失败，请联系客服');
     }
   };
 
@@ -228,14 +158,11 @@ export default function ProfilePage() {
         setRedeemStatus('idle');
         setRedeemMessage('');
       }, 1000);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setRedeemMessage(error.message);
-      } else {
+    } catch (error : unknown) {
+        console.error(error);
         setRedeemMessage('VIP兑换失败，请检查兑换码是否正确');
-      }
-      setRedeemStatus('error');
-    }
+        setRedeemStatus('error');
+    };
   };
 
   const handleRedeemPayment = async () => {
@@ -251,7 +178,7 @@ export default function ProfilePage() {
       
       if (response.status === 'ok') {
         setPaymentStatus('success');
-        setPaymentMessage(`充值成功! 获得 ${response.data.points} 许愿币`);
+        setPaymentMessage(`充值成功!`);
         setPaymentCode('');
         
         // 1秒后刷新用户资料和充值历史
@@ -262,21 +189,18 @@ export default function ProfilePage() {
           setPaymentMessage('');
         }, 1000);
       } else {
-        throw new Error(response.message || '充值失败');
+        throw new Error(response.message || 'VIP兑换失败，请检查兑换码是否正确');
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setPaymentMessage(error.message);
-      } else {
-        setPaymentMessage('充值失败，请检查充值码是否正确');
-      }
+    } catch (error : unknown) {
+      console.error(error);
+      setPaymentMessage('充值失败，请检查充值码是否正确');
       setPaymentStatus('error');
     }
   };
 
   const handleViewGame = async (gameId: string) => {
     try {
-      const response = await fetch(`/api/games/${gameId}`, {
+      const response = await fetch(baseUrl + `/api/games/${gameId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -452,6 +376,15 @@ export default function ProfilePage() {
                 )}
               </div>
             </div>
+            {/* 在充值区域下方添加购买按钮 */}
+            <div className="mt-4">
+              <button
+                onClick={() => setShowPurchaseGuide(true)}
+                className="text-blue-500 hover:text-blue-600 underline"
+              >
+                如何购买兑换码？
+              </button>
+            </div>
           </div>
         </div>
 
@@ -524,8 +457,8 @@ export default function ProfilePage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paymentHistory.map((payment) => (
-                  <tr key={payment.id}>
+                {paymentHistory.map((payment, index) => (
+                  <tr key={payment.id || `payment-${index}`}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {payment.code}
                     </td>
@@ -543,96 +476,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* 支付二维码弹窗 */}
-      {showQRCode && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
-            <div className="flex flex-col items-center space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                微信支付
-              </h3>
-              
-              {depositStatus === 'idle' && (
-                <div className="flex flex-col items-center space-y-4">
-                  <p className="text-lg font-medium">
-                    充值金额：{amount} 元
-                  </p>
-                  <button
-                    onClick={handleDeposit}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-                  >
-                    确认充值
-                  </button>
-                </div>
-              )}
-
-              {depositStatus === 'pending' && currentTransaction && (
-                <>
-                  {/* 使用订单号生成二维码 */}
-                  <div 
-                    className="w-48 h-48 bg-gray-100 flex items-center justify-center border cursor-pointer"
-                    onClick={handlePaymentComplete}
-                    title="点击模拟支付完成"
-                  >
-                    <div className="text-center">
-                      <div className="grid grid-cols-8 grid-rows-8 gap-1 p-4">
-                        {Array.from({ length: 64 }).map((_, i) => (
-                          <div
-                            key={i}
-                            className={`w-4 h-4 ${
-                              Math.random() > 0.5 ? 'bg-black' : 'bg-white'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        订单号：{currentTransaction}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    请使用微信扫描二维码支付
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    (点击二维码模拟支付完成)
-                  </p>
-                </>
-              )}
-
-              {depositStatus === 'loading' && (
-                <div className="text-gray-600">
-                  处理中...
-                </div>
-              )}
-
-              {depositStatus === 'success' && (
-                <div className="text-green-500">
-                  {depositMessage}
-                </div>
-              )}
-
-              {depositStatus === 'error' && (
-                <div className="text-red-500">
-                  {depositMessage}
-                </div>
-              )}
-
-              <button
-                onClick={() => {
-                  setShowQRCode(false);
-                  setDepositStatus('idle');
-                  setDepositMessage('');
-                  setCurrentTransaction('');
-                }}
-                className="mt-4 px-4 py-2 text-gray-600 hover:text-gray-900"
-              >
-                关闭
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 游戏详情弹窗 */}
       <GameDetailCard
         game={selectedGame}
@@ -642,6 +485,104 @@ export default function ProfilePage() {
           setSelectedGame(null);
         }}
       />
+
+      {/* 购买指南弹窗 */}
+      {showPurchaseGuide && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={(e) => {
+            // 如果点击的是最外层的遮罩层，则关闭弹窗
+            if (e.target === e.currentTarget) {
+              setShowPurchaseGuide(false);
+              setSelectedPlatform(null);
+            }
+          }}
+        >
+          <div 
+            className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()} // 阻止点击内容区域时触发外层关闭
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold">购买指南</h3>
+              <button
+                onClick={() => {
+                  setShowPurchaseGuide(false);
+                  setSelectedPlatform(null);
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <span className="text-2xl">×</span>
+              </button>
+            </div>
+
+            {!selectedPlatform ? (
+              // 平台选择界面
+              <div className="space-y-6">
+                <h4 className="text-lg font-medium text-gray-900">请选择购买平台</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {platforms.map(platform => (
+                    <button
+                      key={platform.id}
+                      onClick={() => setSelectedPlatform(platform.id as Platform)}
+                      className={`p-4 rounded-lg ${platform.color} text-white flex flex-col items-center justify-center space-y-2 transition-transform hover:scale-105`}
+                    >
+                      <span className="text-2xl">{platform.icon}</span>
+                      <span>{platform.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              // 平台特定的购买步骤
+              <div className="space-y-8">
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setSelectedPlatform(null)}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    ← 返回选择平台
+                  </button>
+                  <h4 className="text-lg font-medium text-gray-900">
+                    {platforms.find(p => p.id === selectedPlatform)?.name}购买流程
+                  </h4>
+                </div>
+                
+                {platformSteps[selectedPlatform].map((step, index) => (
+                  <div key={index} className="border-b pb-6 last:border-b-0">
+                    <h4 className="text-lg font-medium mb-4 text-blue-600">
+                      {step.title}
+                    </h4>
+                    {index === 0 && (
+                      <a
+                        href={platforms.find(p => p.id === selectedPlatform)?.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center px-4 py-2 ${
+                          platforms.find(p => p.id === selectedPlatform)?.color
+                        } text-white rounded transition-colors mb-4`}
+                      >
+                        <span className="mr-2">
+                          {platforms.find(p => p.id === selectedPlatform)?.icon}
+                        </span>
+                        前往购买
+                      </a>
+                    )}
+                    <p className="text-gray-600 mb-4">{step.description}</p>
+                    <div className="relative h-48 w-full">
+                      <Image
+                        src={step.image}
+                        alt={step.title}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

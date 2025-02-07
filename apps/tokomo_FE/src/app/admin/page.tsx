@@ -4,14 +4,14 @@ import { useRouter } from 'next/navigation';
 import { GameManagement } from '@/components/admin/GameManagement';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { CodeManagement } from '@/components/admin/CodeManagement';
-import { RecordManagement } from '@/components/admin/RecordManagement';
+import { PaymentCodeManagement } from '@/components/admin/PaymentCodeManagement';
 
 // 导航项配置
 const navItems = [
   { id: 'games', label: '游戏管理', icon: '🎮' },
   { id: 'users', label: '用户管理', icon: '👥' },
-  { id: 'codes', label: '兑换码管理', icon: '🎫' },
-  { id: 'records', label: '记录查询', icon: '📊' }
+  { id: 'vipcodes', label: '兑换码管理', icon: '🎫' },
+  { id: 'paymentcodes', label: '支付码管理', icon: '💳' },
 ];
 
 export default function AdminPage() {
@@ -36,6 +36,7 @@ export default function AdminPage() {
           setIsAdmin(true);
         }
       } catch (error) {
+        console.error('检查管理员状态失败:', error);
         router.push('/');
       }
     };
@@ -94,8 +95,8 @@ export default function AdminPage() {
           <div className="bg-white rounded-lg shadow">
             {activeNav === 'games' && <GameManagement />}
             {activeNav === 'users' && <UserManagement />}
-            {activeNav === 'codes' && <CodeManagement />}
-            {activeNav === 'records' && <RecordManagement />}
+            {activeNav === 'vipcodes' && <CodeManagement />}
+            {activeNav === 'paymentcodes' && <PaymentCodeManagement />}
           </div>
         </div>
       </div>

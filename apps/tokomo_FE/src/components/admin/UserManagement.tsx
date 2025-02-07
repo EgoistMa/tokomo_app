@@ -28,7 +28,7 @@ export function UserManagement() {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -38,6 +38,7 @@ export function UserManagement() {
         setUsers(data.data);
       }
     } catch (error) {
+      console.error('加载用户列表失败', error);
       showToast('加载用户列表失败', 'error');
     } finally {
       setLoading(false);
@@ -46,14 +47,14 @@ export function UserManagement() {
 
   const handleToggleActive = async (userId: number, currentStatus: boolean) => {
     try {
-      const response = await fetch(`/api/admin/users/${userId}/status`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
-          isActive: !currentStatus
+          isActive: !currentStatus  // 只发送isActive字段
         })
       });
 
@@ -79,7 +80,7 @@ export function UserManagement() {
     if (!editingUser) return;
 
     try {
-      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users/${editingUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

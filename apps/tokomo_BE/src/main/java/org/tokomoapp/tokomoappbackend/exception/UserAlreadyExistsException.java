@@ -1,7 +1,0 @@
-package org.tokomoapp.tokomoappbackend.exception;
-
-public class UserAlreadyExistsException extends RuntimeException {
-    public UserAlreadyExistsException(String message) {
-        super(message);
-    }
-} 

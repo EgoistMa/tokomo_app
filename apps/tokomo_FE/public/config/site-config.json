@@ -1,91 +1,154 @@
 {
   "customerService": {
-    "title": "联系客服",
-    "qq": {
-      "number": "12345678",
-      "label": "QQ号："
-    },
-    "qrCode": {
-      "url": "https://example.com/qr-code.png",
-      "width": "w-48",
-      "height": "h-48"
-    }
+      "title": "联系客服",
+      "qq": {
+          "number": "12345678",
+          "label": "QQ号："
+      },
+      "qrCode": {
+          "url": "https://example.com/qr-code.png",
+          "width": "w-48",
+          "height": "h-48"
+      }
   },
   "carousel": {
-    "items": [
-      {
-        "image": "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg",
-        "title": "轮播图1",
-        "description": "轮播图1的描述",
-        "link": "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
-      },
-      {
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc9APxkj0xClmrU3PpMZglHQkx446nQPG6lA&s",
-        "title": "轮播图2",
-        "description": "轮播图2的描述",
-        "link": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc9APxkj0xClmrU3PpMZglHQkx446nQPG6lA&s"
-      },
-      {
-        "image": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
-        "title": "",
-        "description": "",
-        "link": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+      "items": [
+          {
+              "image": "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg",
+              "title": "轮播图1",
+              "description": "轮播图1的描述",
+              "link": "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
+          },
+          {
+              "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc9APxkj0xClmrU3PpMZglHQkx446nQPG6lA&s",
+              "title": "轮播图2",
+              "description": "轮播图2的描述",
+              "link": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc9APxkj0xClmrU3PpMZglHQkx446nQPG6lA&s"
+          },
+          {
+              "image": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
+              "title": "",
+              "description": "",
+              "link": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+          }
+      ],
+      "settings": {
+          "autoplay": true,
+          "interval": 5000,
+          "showDots": true,
+          "showArrows": true
       }
-    ],
-    "settings": {
-      "autoplay": true,
-      "interval": 5000,
-      "showDots": true,
-      "showArrows": true
-    }
   },
   "banners": {
-    "left": {
-      "text": "你好",
-      "image": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
-      "link": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
-    },
-    "right": {
-      "text": "BANNER",
-      "image": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
-      "link": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
-    }
+      "left": {
+          "text": "你好",
+          "image": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
+          "link": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+      },
+      "right": {
+          "text": "BANNER",
+          "image": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
+          "link": "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+      }
   },
   "footer": {
-    "sections": [
-      {
-        "title": "关于我们",
-        "links": [
-          { "text": "公司简介", "href": "#" },
-          { "text": "联系方式", "href": "#" },
-          { "text": "加入我们", "href": "#" }
-        ]
-      },
-      {
-        "title": "服务支持",
-        "links": [
-          { "text": "帮助中心", "href": "#" },
-          { "text": "售后服务", "href": "#" },
-          { "text": "常见问题", "href": "#" }
-        ]
-      },
-      {
-        "title": "商务合作",
-        "links": [
-          { "text": "商家入驻", "href": "#" },
-          { "text": "合作伙伴", "href": "#" },
-          { "text": "广告投放", "href": "#" }
-        ]
-      },
-      {
-        "title": "关注我们",
-        "links": [
-          { "text": "微信公众号", "href": "#" },
-          { "text": "新浪微博", "href": "#" },
-          { "text": "企业邮箱", "href": "#" }
-        ]
+      "sections": [
+          {
+              "title": "",
+              "links": [
+                  {
+                      "text": "",
+                      "href": "#"
+                  },
+                  {
+                      "text": "",
+                      "href": "#"
+                  },
+                  {
+                      "text": "",
+                      "href": "#"
+                  }
+              ]
+          }
+      ],
+      "copyright": "© 2025 TokomoApp. All rights reserved."
+  },
+  "purchaseGuide": {
+      "platforms": [
+          {
+              "id": "xhs",
+              "name": "小红书购买",
+              "icon": "🛍️",
+              "url": "https://www.xiaohongshu.com/goods-detail/67a1bc685ed727000136dad2",    
+              "color": "bg-pink-500 hover:bg-pink-600"
+          },
+          {
+              "id": "tb",
+              "name": "淘宝购买",
+              "icon": "🛒",
+              "url": "https://item.taobao.com/item.htm?id=xxx",
+              "color": "bg-orange-500 hover:bg-orange-600"
+          },
+          {
+              "id": "xy",
+              "name": "闲鱼购买",
+              "icon": "💫",
+              "url": "https://2.taobao.com/item.htm?id=xxx",
+              "color": "bg-blue-500 hover:bg-blue-600"
+          }
+      ],
+      "steps": {
+          "xhs": [
+              {
+                  "title": "Step 1: 打开小红书",
+                  "description": "点击链接前往小红书商品页面",
+                  "image": "/images/purchase/xhs/step1.png"
+              },
+              {
+                  "title": "Step 2: 选择商品",
+                  "description": "在小红书选择您需要的VIP或许愿币兑换码",
+                  "image": "/images/purchase/xhs/step2.png"
+              },
+              {
+                  "title": "Step 3: 私信购买",
+                  "description": "通过小红书私信联系客服购买",
+                  "image": "/images/purchase/xhs/step3.png"
+              }
+          ],
+          "tb": [
+              {
+                  "title": "Step 1: 打开淘宝",
+                  "description": "点击链接前往淘宝商品页面",
+                  "image": "/images/purchase/tb/step1.png"
+              },
+              {
+                  "title": "Step 2: 拍下商品",
+                  "description": "选择商品规格并付款",
+                  "image": "/images/purchase/tb/step2.png"
+              },
+              {
+                  "title": "Step 3: 获取兑换码",
+                  "description": "付款后通过淘宝消息获取兑换码",
+                  "image": "/images/purchase/tb/step3.png"
+              }
+          ],
+          "xy": [
+              {
+                  "title": "Step 1: 打开闲鱼",
+                  "description": "点击链接前往闲鱼商品页面",
+                  "image": "/images/purchase/xy/step1.png"
+              },
+              {
+                  "title": "Step 2: 联系卖家",
+                  "description": "通过闲鱼聊天联系卖家",
+                  "image": "/images/purchase/xy/step2.png"
+              },
+              {
+                  "title": "Step 3: 支付获码",
+                  "description": "通过闲鱼担保交易完成购买",
+                  "image": "/images/purchase/xy/step3.png"
+              }
+          ]
       }
-    ],
-    "copyright": "© 2025 TokomoApp. All rights reserved."
   }
-} 
+}
