@@ -85,6 +85,12 @@ public class UserController {
             
             try {
                 User user = userService.authenticateUser(username, password);
+                //if user have been banned
+                if(!user.getIsActive() ){
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse("error", "账号被停用"));
+                }
+                
                 String token = jwtUtil.generateToken(user);
                 
                 Map<String, Object> data = new HashMap<>();
