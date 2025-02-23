@@ -568,12 +568,14 @@ export default function ProfilePage() {
                     )}
                     <p className="text-gray-600 mb-4">{step.description}</p>
                     <div className="relative h-48 w-full">
-                      <Image
-                        src={step.image}
-                        alt={step.title}
-                        fill
-                        className="object-contain"
-                      />
+                      {step.image && (
+                        <Image
+                          src={step.image}
+                          alt={step.title}
+                          fill
+                          className="object-contain"
+                        />
+                      )}
                     </div>
                   </div>
                 ))}
