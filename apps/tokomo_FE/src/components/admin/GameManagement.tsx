@@ -36,7 +36,7 @@ export function GameManagement() {
   const loadGames = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/games`, {
+      const response = await fetch(`//api.tokomoapp.org/api/admin/games`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -55,7 +55,7 @@ export function GameManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const url = editingGame ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/games/${editingGame.id}` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/games`;
+      const url = editingGame ? `//api.tokomoapp.org/api/admin/games/${editingGame.id}` : `//api.tokomoapp.org/api/admin/games`;
       const method = editingGame ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -85,7 +85,7 @@ export function GameManagement() {
     if (!confirm('确定要删除这个游戏吗？')) return;
     
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/games/${id}`, {
+      const response = await fetch(`//api.tokomoapp.org/api/admin/games/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -118,7 +118,7 @@ export function GameManagement() {
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/games/upload?mode=${uploadMode}`, {
+      const response = await fetch(`//api.tokomoapp.org/api/admin/games/upload?mode=${uploadMode}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

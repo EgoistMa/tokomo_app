@@ -104,7 +104,7 @@ export const authService = {
   // 注册
   async register(data: RegisterData): Promise<RegisterResponse> {
     try {
-      const response = await fetch('api.tokomoapp.org/api/user/register', {
+      const response = await fetch('//api.tokomoapp.org/api/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ export const authService = {
   // 获取用户资料
   getProfile: async () => {
     const token = localStorage.getItem('token');
-    const response = await fetch('api.tokomoapp.org/api/user/profile', {
+    const response = await fetch('//api.tokomoapp.org/api/user/profile', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -145,7 +145,7 @@ export const authService = {
   async deposit(amount: number): Promise<DepositResponse> {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('api.tokomoapp.org/api/user/deposit', {
+      const response = await fetch('//api.tokomoapp.org/api/user/deposit', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -170,7 +170,7 @@ export const authService = {
   async resolveTransaction(externalTransactionKey: string): Promise<ResolveTransactionResponse> {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('api.tokomoapp.org/api/user/transaction/resolve', {
+      const response = await fetch('//api.tokomoapp.org/api/user/transaction/resolve', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -198,7 +198,7 @@ export const authService = {
   async redeemVIP(code: string): Promise<RedeemVIPResponse> {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('api.tokomoapp.org/api/user/redeem-vip', {
+      const response = await fetch('//api.tokomoapp.org/api/user/redeem-vip', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -220,7 +220,7 @@ export const authService = {
   },
 
   async redeemPayment(code: string) {
-    const response = await fetch('api.tokomoapp.org/api/user/redeem-payment', {
+    const response = await fetch('//api.tokomoapp.org/api/user/redeem-payment', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

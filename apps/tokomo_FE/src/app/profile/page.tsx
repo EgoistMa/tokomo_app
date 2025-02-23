@@ -101,7 +101,7 @@ export default function ProfilePage() {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch(`/api/user/purchase-history`, {
+      const response = await fetch(`//api.tokomoapp.org/api/user/purchase-history`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -122,7 +122,7 @@ export default function ProfilePage() {
 
   const loadPaymentHistory = async () => {
     try {
-      const response = await fetch('/api/user/payment-history', {
+      const response = await fetch('//api.tokomoapp.org/api/user/payment-history', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -199,7 +199,7 @@ export default function ProfilePage() {
 
   const handleViewGame = async (gameId: string) => {
     try {
-      const response = await fetch(`/api/games/${gameId}`, {
+      const response = await fetch(`//api.tokomoapp.org/api/games/${gameId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

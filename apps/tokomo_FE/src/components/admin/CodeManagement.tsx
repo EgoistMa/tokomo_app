@@ -33,7 +33,7 @@ export function CodeManagement() {
 
   const loadCodes = async () => {
     try {
-      const response = await fetch(`/api/admin/vip/codes`, {
+      const response = await fetch(`//api.tokomoapp.org/api/admin/vip/codes`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -52,7 +52,7 @@ export function CodeManagement() {
   const handleGenerateCodes = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/admin/vip/genVip`, {
+      const response = await fetch(`//api.tokomoapp.org/api/admin/vip/genVip`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ export function CodeManagement() {
     if (!confirm('确定要删除这个兑换码吗？')) return;
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/vip/codes/${id}`, {
+      const response = await fetch(`//api.tokomoapp.org/api/admin/vip/codes/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -148,7 +148,7 @@ export function CodeManagement() {
     if (!editingCode) return;
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/vip/codes/${id}`, {
+      const response = await fetch(`//api.tokomoapp.org/api/admin/vip/codes/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -459,7 +459,7 @@ export function CodeManagement() {
                   formData.append('file', selectedFile);
 
                   try {
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/vip/set`, {
+                    const response = await fetch(`//api.tokomoapp.org/api/admin/vip/set`, {
                       method: 'POST',
                       headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`

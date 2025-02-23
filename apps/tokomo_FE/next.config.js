@@ -13,7 +13,7 @@ const nextConfig = {
   //   return [
   //     {
   //       source: '/api/:path*',
-  //       destination: 'http://api.tokomoapp.org/api/:path*'
+  //       destination: 'http:////api.tokomoapp.org/api/:path*'
   //     }
   //   ];
   // }

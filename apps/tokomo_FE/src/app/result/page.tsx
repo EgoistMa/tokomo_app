@@ -78,7 +78,7 @@ function SearchResults() {
           return;
         }
 
-        const response = await fetch(`api.tokomoapp.org/api/games/search?keyword=${encodeURIComponent(keyword)}`, {
+        const response = await fetch(`//api.tokomoapp.org/api/games/search?keyword=${encodeURIComponent(keyword)}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -127,7 +127,7 @@ function SearchResults() {
       const token = localStorage.getItem('token');
       
       // 先尝试获取游戏详情
-      const response = await fetch(`api.tokomoapp.org/api/games/${gameId}`, {
+      const response = await fetch(`//api.tokomoapp.org/api/games/${gameId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -138,7 +138,7 @@ function SearchResults() {
       if (response.status === 403) {
         // 需要购买游戏
         try {
-          const purchaseResponse = await fetch('api.tokomoapp.org/api/games/purchase', {
+          const purchaseResponse = await fetch('//api.tokomoapp.org/api/games/purchase', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
