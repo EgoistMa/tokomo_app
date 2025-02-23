@@ -121,7 +121,7 @@ export default function Home() {
     setIsSearching(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/games/search?keyword=${encodeURIComponent(searchKeyword.trim())}`, {
+      const response = await fetch(`//api.tokomoapp.org/api/games/search?keyword=${encodeURIComponent(searchKeyword.trim())}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

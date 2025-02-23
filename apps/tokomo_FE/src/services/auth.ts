@@ -76,7 +76,7 @@ export const authService = {
         }
       });
 
-      const response = await fetch('/api/user/login', {
+      const response = await fetch('//api.tokomoapp.org/api/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
