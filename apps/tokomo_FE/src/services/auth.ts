@@ -6,8 +6,8 @@ interface LoginData {
 interface RegisterData {
   username: string;
   password: string;
-  question: string;
-  answer: string;
+  securityQuestion: string;
+  securityAnswer: string;
   vipCode?: string;
 }
 
@@ -112,8 +112,8 @@ export const authService = {
         body: JSON.stringify({
           username: data.username,
           password: data.password,
-          question: data.question,
-          answer: data.answer,
+          question: data.securityQuestion,
+          answer: data.securityAnswer,
           vipCode: data.vipCode
         }),
       });
