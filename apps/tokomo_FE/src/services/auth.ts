@@ -112,8 +112,8 @@ export const authService = {
         body: JSON.stringify({
           username: data.username,
           password: data.password,
-          question: data.securityQuestion,
-          answer: data.securityAnswer,
+          securityQuestion: data.securityQuestion,
+          securityAnswer: data.securityAnswer,
           vipCode: data.vipCode
         }),
       });
