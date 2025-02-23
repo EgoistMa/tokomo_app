@@ -54,7 +54,12 @@ public class UserController {
                 userService.redeemVipCode(user.getId(), VipCode);
             }
 
-            return ResponseEntity.ok(new ApiResponse("ok", "Registration successful", user.sanitize()));
+            String token =  jwtUtil.generateToken(user);
+            Map<String, Object> data = new HashMap<>();
+            data.put("user",user.sanitize());
+            data.put("token", token);
+
+            return ResponseEntity.ok(new ApiResponse("ok", "Registration successful", data));
         } catch (UserAlreadyExistsException e) {
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
