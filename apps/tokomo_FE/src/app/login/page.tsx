@@ -72,8 +72,8 @@ export default function LoginPage() {
         const registerData = {
           username: formData.username,
           password: formData.password,
-          question: formData.question,
-          answer: formData.answer,
+          securityQuestion: formData.question,
+          securityAnswer: formData.answer,
           vipCode: formData.vipCode || undefined  // 如果为空则不包含此字段
         };
 
