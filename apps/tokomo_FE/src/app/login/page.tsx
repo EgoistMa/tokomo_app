@@ -7,10 +7,9 @@ import { authService } from '@/services/auth';
 interface RegisterFormData {
   username: string;
   password: string;
-  question: string;
-  answer: string;
+  securityQuestion: string;
+  securityAnswer: string;
   vipCode?: string;  // 改为可选
-  remember: boolean;  // 添加 remember 字段
 }
 
 export default function LoginPage() {
@@ -19,10 +18,9 @@ export default function LoginPage() {
   const [formData, setFormData] = useState<RegisterFormData>({
     username: '',
     password: '',
-    question: '',
-    answer: '',
+    securityQuestion: '',
+    securityAnswer: '',
     vipCode: '',  // 改名为 vipCode
-    remember: false,  // 设置初始值
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -72,8 +70,8 @@ export default function LoginPage() {
         const registerData = {
           username: formData.username,
           password: formData.password,
-          securityQuestion: formData.question,
-          securityAnswer: formData.answer,
+          question: formData.securityQuestion,
+          answer: formData.securityAnswer,
           vipCode: formData.vipCode || undefined  // 如果为空则不包含此字段
         };
 
@@ -182,7 +180,7 @@ export default function LoginPage() {
                     name="question"
                     type="text"
                     required
-                    value={formData.question}
+                    value={formData.securityQuestion}
                     onChange={handleInputChange}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="请输入安全问题"
@@ -197,7 +195,7 @@ export default function LoginPage() {
                     name="answer"
                     type="text"
                     required
-                    value={formData.answer}
+                    value={formData.securityAnswer}
                     onChange={handleInputChange}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="请输入答案"
@@ -223,19 +221,6 @@ export default function LoginPage() {
 
           {isLogin && (
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember"
-                  name="remember"
-                  type="checkbox"
-                  checked={formData.remember}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember" className="ml-2 block text-sm text-gray-900">
-                  记住我
-                </label>
-              </div>
               <div className="text-sm">
                 <Link href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
                   忘记密码？
