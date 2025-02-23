@@ -7,15 +7,16 @@ const nextConfig = {
         hostname: '**',
       },
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://api.tokomoapp.org/api/:path*'
-      }
-    ];
   }
+  //,
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/api/:path*',
+  //       destination: 'http://api.tokomoapp.org/api/:path*'
+  //     }
+  //   ];
+  // }
 }
 
 module.exports = nextConfig 
