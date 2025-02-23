@@ -177,7 +177,7 @@ export default function LoginPage() {
                   </label>
                   <input
                     id="question"
-                    name="question"
+                    name="securityQuestion"
                     type="text"
                     required
                     value={formData.securityQuestion}
@@ -192,7 +192,7 @@ export default function LoginPage() {
                   </label>
                   <input
                     id="answer"
-                    name="answer"
+                    name="securityAnswer"
                     type="text"
                     required
                     value={formData.securityAnswer}
