@@ -1,6 +1,6 @@
 export const searchProducts = async (keyword: string) => {
   try {
-    const response = await fetch(`/api/games/search?keyword=${encodeURIComponent(keyword)}`);
+    const response = await fetch(`api.tokomoapp.org/api/games/search?keyword=${encodeURIComponent(keyword)}`);
     const data = await response.json();
     return {
       success: true,

@@ -29,7 +29,7 @@ export function PaymentCodeManagement() {
 
   const loadCodes = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/payment/codes`, {
+      const response = await fetch(`api.tokomoapp.org/api/admin/payment/codes`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -54,7 +54,7 @@ export function PaymentCodeManagement() {
     if (!confirm('确定要删除这个支付码吗？')) return;
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/payment/codes/${id}`, {
+      const response = await fetch(`api.tokomoapp.org/api/admin/payment/codes/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -78,7 +78,7 @@ export function PaymentCodeManagement() {
     if (!editingCode) return;
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/payment/codes/${id}`, {
+      const response = await fetch(`api.tokomoapp.org/api/admin/payment/codes/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ export function PaymentCodeManagement() {
   const handleGenerateCodes = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/payment/genPay`, {
+      const response = await fetch(`api.tokomoapp.org/api/admin/payment/genPay`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -358,7 +358,7 @@ export function PaymentCodeManagement() {
                   formData.append('file', selectedFile);
 
                   try {
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/payment/setPay`, {
+                    const response = await fetch(`api.tokomoapp.org/api/admin/payment/setPay`, {
                       method: 'POST',
                       headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`

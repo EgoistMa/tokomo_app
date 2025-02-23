@@ -24,7 +24,7 @@ export default function AdminPage() {
     // 检查是否是管理员
     const checkAdmin = async () => {
       try {
-        const response = await fetch('/api/user/profile', {
+        const response = await fetch('api.tokomoapp.org/api/user/profile', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
