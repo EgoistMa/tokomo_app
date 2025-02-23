@@ -33,7 +33,7 @@ export function CodeManagement() {
 
   const loadCodes = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/vip/codes`, {
+      const response = await fetch(`/api/admin/vip/codes`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -52,7 +52,7 @@ export function CodeManagement() {
   const handleGenerateCodes = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/vip/genVip`, {
+      const response = await fetch(`/api/admin/vip/genVip`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

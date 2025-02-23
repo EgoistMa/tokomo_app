@@ -7,7 +7,6 @@ import { GameDetailCard } from '@/components/GameDetailCard';
 import Image from 'next/image';
 import { siteConfig } from "@/config/site";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 interface Game {
   id: string;
@@ -102,7 +101,7 @@ export default function ProfilePage() {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch(`${baseUrl}/api/user/purchase-history`, {
+      const response = await fetch(`/api/user/purchase-history`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -200,7 +199,7 @@ export default function ProfilePage() {
 
   const handleViewGame = async (gameId: string) => {
     try {
-      const response = await fetch(baseUrl + `/api/games/${gameId}`, {
+      const response = await fetch(`/api/games/${gameId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
