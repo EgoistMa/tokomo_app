@@ -90,7 +90,7 @@ export function SiteConfigManagement() {
     }
   };
 
-  if (loading) {
+  if (loading || !config) {
     return <div className="p-6">加载中...</div>;
   }
 
