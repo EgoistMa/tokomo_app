@@ -5,13 +5,15 @@ import { GameManagement } from '@/components/admin/GameManagement';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { CodeManagement } from '@/components/admin/CodeManagement';
 import { PaymentCodeManagement } from '@/components/admin/PaymentCodeManagement';
+import { SiteConfigManagement } from '@/components/admin/SiteConfigManagement';
 
 // 导航项配置
 const navItems = [
   { id: 'games', label: '游戏管理', icon: '🎮' },
   { id: 'users', label: '用户管理', icon: '👥' },
-  { id: 'vipcodes', label: '兑换码管理', icon: '🎫' },
-  { id: 'paymentcodes', label: '支付码管理', icon: '💳' },
+  { id: 'vipcodes', label: 'vip兑换码管理', icon: '🎫' },
+  { id: 'paymentcodes', label: '许愿币码管理', icon: '💳' },
+  { id: 'siteconfig', label: '站点配置', icon: '⚙️' },
 ];
 
 export default function AdminPage() {
@@ -97,6 +99,7 @@ export default function AdminPage() {
             {activeNav === 'users' && <UserManagement />}
             {activeNav === 'vipcodes' && <CodeManagement />}
             {activeNav === 'paymentcodes' && <PaymentCodeManagement />}
+            {activeNav === 'siteconfig' && <SiteConfigManagement />}
           </div>
         </div>
       </div>
