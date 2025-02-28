@@ -1,8 +1,53 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 
+interface QRCode {
+  url: string;
+  width: string;
+  height: string;
+}
+
+interface CustomerService {
+  title: string;
+  qq: {
+    number: string;
+    label: string;
+  };
+  qrCode: QRCode;
+}
+
+interface CarouselItem {
+  image: string;
+  title: string;
+  description: string;
+  link: string;
+}
+
+interface Banner {
+  text: string;
+  image: string;
+  link: string;
+}
+
+interface SiteConfig {
+  customerService: CustomerService;
+  carousel: {
+    items: CarouselItem[];
+    settings: {
+      autoplay: boolean;
+      interval: number;
+      showDots: boolean;
+      showArrows: boolean;
+    };
+  };
+  banners: {
+    left: Banner;
+    right: Banner;
+  };
+}
+
 export function SiteConfigManagement() {
-  const [config, setConfig] = useState<any>(null);
+  const [config, setConfig] = useState<SiteConfig | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -120,11 +165,11 @@ export function SiteConfigManagement() {
             </button>
           </div>
           
-          {config.carousel.items.map((item: any, index: number) => (
+          {config.carousel.items.map((item: CarouselItem, index: number) => (
             <div key={index} className="mb-4 p-4 border rounded relative">
               <button
                 onClick={() => {
-                  const newItems = config.carousel.items.filter((_: any, i: number) => i !== index);
+                  const newItems = config.carousel.items.filter((_: CarouselItem, i: number) => i !== index);
                   setConfig({
                     ...config,
                     carousel: { ...config.carousel, items: newItems }
