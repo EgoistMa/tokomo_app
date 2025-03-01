@@ -6,6 +6,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +39,8 @@ import org.tokomoapp.tokomo_be.util.ExcelGameReader;
 import org.tokomoapp.tokomo_be.repository.UserGameRepository;
 import org.tokomoapp.tokomo_be.util.ExcelVipReader;
 import org.tokomoapp.tokomo_be.util.ExcelPaymentReader;
+import org.springframework.beans.factory.annotation.Value;
+import java.nio.file.Path;
 
 
 @RestController
@@ -52,6 +58,11 @@ public class AdminController {
     private VipService vipService;
     @Autowired
     private UserGameRepository userGameRepository;
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    @Value("${config.path}")
+    private String configPath;
 
     @Autowired
     public AdminController(GameService gameService, UserService userService) {
@@ -400,6 +411,36 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse("error", "Error uploading payment codes: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/site-config")
+    public ResponseEntity<ApiResponse> getSiteConfig() {
+        try {
+            Path path = Paths.get(configPath, "site-config.json");
+            // 如果文件不存在，从classpath复制一份作为初始配置
+            if (!Files.exists(path)) {
+                Resource defaultConfig = resourceLoader.getResource("classpath:static/config/site-config.json");
+                Files.copy(Paths.get(defaultConfig.getURI()), path);
+            }
+            String config = new String(Files.readAllBytes(path));
+            return ResponseEntity.ok(new ApiResponse("ok", "配置获取成功", config));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("error", "读取配置失败: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/site-config")
+    public ResponseEntity<ApiResponse> updateSiteConfig(@RequestBody String config) {
+        try {
+            Path path = Paths.get(configPath, "site-config.json");
+            Files.createDirectories(path.getParent()); // 确保目录存在
+            Files.write(path, config.getBytes());
+            return ResponseEntity.ok(new ApiResponse("ok", "配置更新成功"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("error", "更新配置失败: " + e.getMessage()));
         }
     }
 }
