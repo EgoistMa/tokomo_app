@@ -245,7 +245,7 @@ function SearchResults() {
                 className={`ml-4 px-4 py-2 bg-blue-500 text-white rounded-md transition-colors
                   ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
               >
-                {isLoading ? '处理中...' : '领取愿望(如未购买需要80许愿币)'}
+                {isLoading ? '处理中...' : '领取愿望(如未购买需要1许愿币)'}
               </button>
             </div>
           ))}
