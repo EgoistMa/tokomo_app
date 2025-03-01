@@ -1,15 +1,20 @@
-import { siteConfig } from "@/config/site";
 import Image from "next/image";
+import type { SiteConfig } from "@/services/config";
 
 interface CustomerServiceModalProps {
   visible: boolean;
   onClose: () => void;
+  customerService: SiteConfig['customerService'];
 }
 
-export function CustomerServiceModal({ visible, onClose }: CustomerServiceModalProps) {
+export function CustomerServiceModal({ 
+  visible, 
+  onClose,
+  customerService 
+}: CustomerServiceModalProps) {
   if (!visible) return null;
   
-  const { title, qq, qrCode } = siteConfig.customerService;
+  const { title, qq, qrCode } = customerService;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

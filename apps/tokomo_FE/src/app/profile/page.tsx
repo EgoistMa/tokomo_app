@@ -5,7 +5,9 @@ import { authService } from '@/services/auth';
 import Link from 'next/link';
 import { GameDetailCard } from '@/components/GameDetailCard';
 import Image from 'next/image';
-import { siteConfig } from "@/config/site";
+import { showToast } from "@/components/Toast";
+import type { SiteConfig } from "@/services/config";
+import { getSiteConfig } from "@/services/config";
 
 
 interface Game {
@@ -64,13 +66,29 @@ export default function ProfilePage() {
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
   const [showPurchaseGuide, setShowPurchaseGuide] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
+  const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
+
+  // 获取站点配置
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const config = await getSiteConfig();
+        setSiteConfig(config);
+      } catch (error) {
+        console.error('获取站点配置失败:', error);
+        showToast('获取站点配置失败', 'error');
+      }
+    };
+
+    fetchConfig();
+  }, []);
 
   // 使用配置中的平台和步骤
-  const platforms = siteConfig.purchaseGuide.platforms.map(platform => ({
+  const platforms = siteConfig?.purchaseGuide.platforms.map(platform => ({
     ...platform,
-  }));
+  })) || [];
   
-  const platformSteps = siteConfig.purchaseGuide.steps;
+  const platformSteps = siteConfig?.purchaseGuide.steps || {};
 
   const loadProfile = useCallback(async () => {
     try {
@@ -217,7 +235,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) {
+  if (loading || !siteConfig) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-600">加载中...</div>
@@ -519,7 +537,7 @@ export default function ProfilePage() {
               <div className="space-y-6">
                 <h4 className="text-lg font-medium text-gray-900">请选择购买平台</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {platforms.map(platform => (
+                  {platforms.map((platform: SiteConfig['purchaseGuide']['platforms'][0]) => (
                     <button
                       key={platform.id}
                       onClick={() => setSelectedPlatform(platform.id as Platform)}

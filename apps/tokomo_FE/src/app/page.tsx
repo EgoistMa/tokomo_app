@@ -425,6 +425,7 @@ export default function Home() {
       <CustomerServiceModal
         visible={showCustomerService}
         onClose={() => setShowCustomerService(false)}
+        customerService={siteConfig.customerService}
       />
     </div>
   );
