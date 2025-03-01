@@ -1,14 +1,17 @@
 "use client";
 import Image from "next/image";
-import { siteConfig } from "@/config/site";
 import { useState, useEffect } from "react";
 import Link from 'next/link';
 import { authService } from "@/services/auth";
 import { useRouter } from 'next/navigation';
 import { showToast } from "@/components/Toast";
 import { CustomerServiceModal } from '@/components/CustomerServiceModal';
+import type { SiteConfig } from '@/services/config';
+import { getSiteConfig } from '@/services/config';
 
 export default function Home() {
+  const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
+  const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -16,11 +19,28 @@ export default function Home() {
     vipExpireDate: string | null;
     points: number;
   } | null>(null);
-  const totalSlides = siteConfig.carousel.items.length;
+  const totalSlides = siteConfig?.carousel.items.length || 0;
   const [searchKeyword, setSearchKeyword] = useState('');
   const router = useRouter();
   const [isSearching, setIsSearching] = useState(false);
   const [showCustomerService, setShowCustomerService] = useState(false);
+
+  // 获取站点配置
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const config = await getSiteConfig();
+        setSiteConfig(config);
+      } catch (error) {
+        console.error('获取站点配置失败:', error);
+        showToast('获取站点配置失败', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConfig();
+  }, []);
 
   // 检查登录状态和获取用户资料
   useEffect(() => {
@@ -62,14 +82,14 @@ export default function Home() {
 
   // 自动轮播
   useEffect(() => {
-    if (!siteConfig.carousel.settings.autoplay) return;
+    if (!siteConfig?.carousel.settings.autoplay) return;
 
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % totalSlides);
     }, siteConfig.carousel.settings.interval);
 
     return () => clearInterval(timer);
-  }, [totalSlides]);
+  }, [totalSlides, siteConfig]);
 
   // 切换到下一张
   const nextSlide = () => {
@@ -142,6 +162,10 @@ export default function Home() {
       setIsSearching(false);
     }
   };
+
+  if (loading || !siteConfig) {
+    return <div>加载中...</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
