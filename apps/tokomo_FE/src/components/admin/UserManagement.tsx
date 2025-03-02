@@ -8,6 +8,7 @@ interface User {
   points: number;
   vipExpireDate: string | null;
   isActive: boolean;
+  isAdmin: boolean;
   createdAt: string;
   lastLoginAt: string;
 }
@@ -20,6 +21,7 @@ export function UserManagement() {
   const [formData, setFormData] = useState({
     points: 0,
     vipExpireDate: '',
+    isAdmin: false,
   });
 
   useEffect(() => {
@@ -138,6 +140,7 @@ export function UserManagement() {
                       setFormData({
                         points: user.points,
                         vipExpireDate: user.vipExpireDate || '',
+                        isAdmin: user.isAdmin,
                       });
                       setEditingUser(user);
                       setShowEditModal(true);
@@ -199,6 +202,21 @@ export function UserManagement() {
                   }))}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isAdmin"
+                  checked={formData.isAdmin}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    isAdmin: e.target.checked
+                  }))}
+                  className="rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                />
+                <label htmlFor="isAdmin" className="text-sm font-medium text-gray-700">
+                  管理员权限
+                </label>
               </div>
               <div className="flex justify-end space-x-4 mt-6">
                 <button
