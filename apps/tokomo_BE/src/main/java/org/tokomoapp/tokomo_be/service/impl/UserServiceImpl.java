@@ -205,4 +205,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    public User deleteUser(long id){
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("用户不存在"));
+            
+        userRepository.delete(user);
+        return user;
+    }
+
 } 

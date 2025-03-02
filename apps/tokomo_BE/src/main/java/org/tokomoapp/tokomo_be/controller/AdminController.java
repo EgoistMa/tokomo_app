@@ -443,4 +443,18 @@ public class AdminController {
                 .body(new ApiResponse("error", "更新配置失败: " + e.getMessage()));
         }
     }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok(new ApiResponse("ok", "用户删除成功"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                .body(new ApiResponse("error", e.getMessage())); 
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("error", "删除用户失败: " + e.getMessage()));
+        }
+    }
 }
