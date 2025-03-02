@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
 
       const data = await response.json();
       if (response.status === 200 && data.status === 'ok') {
-        setSecurityQuestion(data.data.question);
+        setSecurityQuestion(data.data);
         setStep(2);
       } else {
         showToast(data.message || '获取安全问题失败', 'error');
