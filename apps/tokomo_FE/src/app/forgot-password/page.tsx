@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
 
     setLoading(true);
     try {
-      const response = await fetch('//api.tokomoapp.org//api/user/password/security-question', {
+      const response = await fetch('//api.tokomoapp.org/api/user/password/security-question', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
