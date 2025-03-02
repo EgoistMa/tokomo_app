@@ -30,6 +30,6 @@ public interface UserService {
 
     User updateUser(Long id, UserUpdateDTO updates);
 
-    User deletUser(Long id);
+    User deleteUser(Long id);
 
 } 
