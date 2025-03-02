@@ -159,6 +159,32 @@ export function UserManagement() {
                   >
                     {user.isActive ? '禁用' : '启用'}
                   </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm('确定要删除该用户吗?')) {
+                        fetch(`//api.tokomoapp.org/api/admin/users/${user.id}`, {
+                          method: 'DELETE',
+                          headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                          }
+                        })
+                        .then(response => {
+                          if (response.ok) {
+                            setUsers(users.filter(u => u.id !== user.id));
+                          } else {
+                            throw new Error('删除用户失败');
+                          }
+                        })
+                        .catch(error => {
+                          console.error('删除用户出错:', error);
+                          alert('删除用户失败');
+                        });
+                      }
+                    }}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    删除
+                  </button>
                 </td>
               </tr>
             ))}
