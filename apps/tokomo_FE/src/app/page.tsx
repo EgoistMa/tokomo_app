@@ -314,7 +314,7 @@ export default function Home() {
         </div>
 
         {/* PC端布局 */}
-        <div className="hidden md:block flex-1 relative">
+        <div className="hidden md:block relative h-[600px]">
           {/* PC端左右banner */}
           <div className="absolute left-5 inset-y-0 w-[150px] h-[400px] bg-gray-100 overflow-hidden">
             <a 
