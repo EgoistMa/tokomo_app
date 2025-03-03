@@ -390,7 +390,7 @@ export default function Home() {
 
           {/* 移动端左右banner */}
           <div className="md:hidden w-full flex flex-row justify-center space-x-4 mt-8 px-4">
-            <div className="w-[150px] h-[200px] bg-gray-100 overflow-hidden">
+            <div className="w-[150px] h-[400px] bg-gray-100 overflow-hidden">
               <a 
                 href={siteConfig.banners.left.link}
                 target="_blank"
@@ -410,7 +410,7 @@ export default function Home() {
                 </div>
               </a>
             </div>
-            <div className="w-[150px] h-[200px] bg-gray-100 overflow-hidden">
+            <div className="w-[150px] h-[400px] bg-gray-100 overflow-hidden">
               <a 
                 href={siteConfig.banners.right.link}
                 target="_blank"
