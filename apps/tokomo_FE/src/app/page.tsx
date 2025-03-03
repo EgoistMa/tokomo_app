@@ -317,7 +317,7 @@ export default function Home() {
         <div className="relative">
           {/* PC端左右banner */}
           <div className="hidden md:block">
-            <div className="absolute left-5 inset-y-0 w-[150px] bg-gray-100 overflow-hidden">
+            <div className="absolute left-5 inset-y-0 w-[150px] h-[400px] bg-gray-100 overflow-hidden">
               <a 
                 href={siteConfig.banners.left.link}
                 target="_blank"
@@ -337,7 +337,7 @@ export default function Home() {
                 </div>
               </a>
             </div>
-            <div className="absolute right-5 inset-y-0 w-[150px] bg-gray-100 overflow-hidden">
+            <div className="absolute right-5 inset-y-0 w-[150px] h-[400px] bg-gray-100 overflow-hidden">
               <a 
                 href={siteConfig.banners.right.link}
                 target="_blank"
