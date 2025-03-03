@@ -239,7 +239,7 @@ export default function Home() {
       </nav>
 
       {/* 主要内容区域 */}
-      <main className="flex flex-col space-y-5">
+      <main className="flex-1 flex flex-col">
         {/* Banner轮播图 */}
         <div className="w-full h-[200px] md:h-[400px] relative overflow-hidden">
           {siteConfig.carousel.items.map((item, index) => (
@@ -314,7 +314,7 @@ export default function Home() {
         </div>
 
         {/* 内容区域 */}
-        <div className="relative">
+        <div className="relative flex-1">
           {/* PC端左右banner */}
           <div className="hidden md:block">
             <div className="absolute left-5 inset-y-0 w-[150px] h-[400px] bg-gray-100 overflow-hidden">
@@ -389,7 +389,7 @@ export default function Home() {
           </div>
 
           {/* 移动端左右banner */}
-          <div className="md:hidden w-full flex flex-row justify-center space-x-4 mt-8 px-4">
+          <div className="md:hidden w-full flex flex-row justify-center space-x-4 mt-8 mb-8 px-4">
             <div className="w-[150px] h-[400px] bg-gray-100 overflow-hidden">
               <a 
                 href={siteConfig.banners.left.link}
@@ -444,8 +444,8 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-100 py-8 mt-8">
+      {/* Footer - 确保在所有内容之后 */}
+      <footer className="bg-gray-100 py-8">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-4 gap-8">
             {siteConfig.footer.sections.map((section, index) => (
