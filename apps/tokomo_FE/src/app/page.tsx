@@ -239,7 +239,7 @@ export default function Home() {
       </nav>
 
       {/* 主要内容区域 */}
-      <main className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col">
         {/* Banner轮播图 */}
         <div className="w-full h-[200px] md:h-[400px] relative overflow-hidden">
           {siteConfig.carousel.items.map((item, index) => (
@@ -313,55 +313,53 @@ export default function Home() {
           )}
         </div>
 
-        {/* 内容区域 */}
-        <div className="relative flex-1">
+        {/* PC端布局 */}
+        <div className="hidden md:block flex-1 relative">
           {/* PC端左右banner */}
-          <div className="hidden md:block">
-            <div className="absolute left-5 inset-y-0 w-[150px] h-[400px] bg-gray-100 overflow-hidden">
-              <a 
-                href={siteConfig.banners.left.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full h-full relative group"
-              >
-                <Image
-                  src={siteConfig.banners.left.image}
-                  alt={siteConfig.banners.left.text}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-                  <span className="text-white tracking-wider font-medium writing-vertical-rl">
-                    {siteConfig.banners.left.text}
-                  </span>
-                </div>
-              </a>
-            </div>
-            <div className="absolute right-5 inset-y-0 w-[150px] h-[400px] bg-gray-100 overflow-hidden">
-              <a 
-                href={siteConfig.banners.right.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full h-full relative group"
-              >
-                <Image
-                  src={siteConfig.banners.right.image}
-                  alt={siteConfig.banners.right.text}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-                  <span className="text-white tracking-wider font-medium writing-vertical-rl">
-                    {siteConfig.banners.right.text}
-                  </span>
-                </div>
-              </a>
-            </div>
+          <div className="absolute left-5 inset-y-0 w-[150px] h-[400px] bg-gray-100 overflow-hidden">
+            <a 
+              href={siteConfig.banners.left.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full h-full relative group"
+            >
+              <Image
+                src={siteConfig.banners.left.image}
+                alt={siteConfig.banners.left.text}
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                <span className="text-white tracking-wider font-medium writing-vertical-rl">
+                  {siteConfig.banners.left.text}
+                </span>
+              </div>
+            </a>
+          </div>
+          <div className="absolute right-5 inset-y-0 w-[150px] h-[400px] bg-gray-100 overflow-hidden">
+            <a 
+              href={siteConfig.banners.right.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full h-full relative group"
+            >
+              <Image
+                src={siteConfig.banners.right.image}
+                alt={siteConfig.banners.right.text}
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                <span className="text-white tracking-wider font-medium writing-vertical-rl">
+                  {siteConfig.banners.right.text}
+                </span>
+              </div>
+            </a>
           </div>
 
-          {/* 搜索区域 - 居中显示 */}
+          {/* PC端搜索区域 */}
           <div className="w-full flex flex-col items-center">
-            <div className="w-[90%] md:w-[400px] flex flex-col items-center space-y-4 mt-8 md:mt-[120px]">
+            <div className="w-[400px] flex flex-col items-center space-y-4 mt-[120px]">
               {/* 搜索框 */}
               <div className="relative w-full">
                 <form onSubmit={handleSubmit}>
@@ -380,7 +378,39 @@ export default function Home() {
               <button 
                 onClick={handleWish}
                 disabled={isSearching}
-                className={`w-full md:w-auto px-8 py-2 bg-blue-500 text-white rounded-lg transition-colors shadow-md
+                className={`w-full px-8 py-2 bg-blue-500 text-white rounded-lg transition-colors shadow-md
+                  ${isSearching ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
+              >
+                {isSearching ? '搜索中...' : '许愿'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 移动端布局 */}
+        <div className="md:hidden flex flex-col">
+          {/* 移动端搜索区域 */}
+          <div className="w-full px-4 flex flex-col items-center">
+            <div className="w-full max-w-[400px] flex flex-col items-center space-y-4 my-8">
+              {/* 搜索框 */}
+              <div className="relative w-full">
+                <form onSubmit={handleSubmit}>
+                  <input 
+                    type="text" 
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500 shadow-lg"
+                    placeholder="搜索..."
+                    disabled={isSearching}
+                  />
+                </form>
+              </div>
+
+              {/* 许愿按钮 */}
+              <button 
+                onClick={handleWish}
+                disabled={isSearching}
+                className={`w-full px-8 py-2 bg-blue-500 text-white rounded-lg transition-colors shadow-md
                   ${isSearching ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
               >
                 {isSearching ? '搜索中...' : '许愿'}
@@ -389,7 +419,7 @@ export default function Home() {
           </div>
 
           {/* 移动端左右banner */}
-          <div className="md:hidden w-full flex flex-row justify-center space-x-4 mt-8 mb-8 px-4">
+          <div className="w-full flex flex-row justify-center space-x-4 px-4 mb-8">
             <div className="w-[150px] h-[400px] bg-gray-100 overflow-hidden">
               <a 
                 href={siteConfig.banners.left.link}
@@ -442,9 +472,9 @@ export default function Home() {
             联系客服
           </button>
         </div>
-      </main>
+      </div>
 
-      {/* Footer - 确保在所有内容之后 */}
+      {/* Footer */}
       <footer className="bg-gray-100 py-8">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-4 gap-8">
