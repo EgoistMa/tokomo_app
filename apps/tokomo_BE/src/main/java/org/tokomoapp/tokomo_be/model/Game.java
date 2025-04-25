@@ -8,6 +8,7 @@ import lombok.Data;
 @Table(name = "games")
 public class Game {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true)
     private Long id;
 
