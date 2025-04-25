@@ -43,6 +43,10 @@ public class GameServiceImpl implements GameService {
         }
     }
 
+    public  void saveGame(Game game) {
+        gameRepository.save(game);
+    }
+
     @Override
     public void saveGames(List<Game> games) {
         gameRepository.saveAll(games);

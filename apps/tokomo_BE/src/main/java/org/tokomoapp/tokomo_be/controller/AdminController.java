@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.tokomoapp.tokomo_be.dto.GameDTO;
 import org.tokomoapp.tokomo_be.model.ApiResponse;
 import org.tokomoapp.tokomo_be.model.Game;
 import org.tokomoapp.tokomo_be.model.PaymentCode;
@@ -175,6 +176,17 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse("error", "Error fetching games: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/games")
+    public ResponseEntity<ApiResponse> addGames(@RequestBody GameDTO game) {
+        try {
+            gameService.saveGame(game.toGame());
+            return ResponseEntity.ok(new ApiResponse("ok", "Game added successfully"));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("error", "Error adding games: " + e.getMessage()));
         }
     }
 

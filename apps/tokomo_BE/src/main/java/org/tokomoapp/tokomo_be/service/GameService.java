@@ -9,6 +9,7 @@ public interface GameService {
     Optional<Game> getGameById(Long gameId);
     List<Game> searchGames(String keyword);
     List<Game> getGames();
+    void saveGame(Game game);
     void saveGames(List<Game> games);
     Optional<Game> getGameByGameName(String gameName);
     List<Game> getAllGames();
