@@ -182,7 +182,8 @@ public class AdminController {
     @PostMapping("/games")
     public ResponseEntity<ApiResponse> addGames(@RequestBody GameDTO game) {
         try {
-            gameService.saveGame(game.toGame());
+            Game newGame = game.toGame();
+            gameService.saveGame(newGame);
             return ResponseEntity.ok(new ApiResponse("ok", "Game added successfully"));
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

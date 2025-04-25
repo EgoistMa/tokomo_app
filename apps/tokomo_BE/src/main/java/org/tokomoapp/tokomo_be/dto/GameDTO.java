@@ -1,9 +1,10 @@
 package org.tokomoapp.tokomo_be.dto;
+import org.tokomoapp.tokomo_be.model.Game;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.tokomoapp.tokomo_be.model.Game;
+
 
 @Data
 @AllArgsConstructor
