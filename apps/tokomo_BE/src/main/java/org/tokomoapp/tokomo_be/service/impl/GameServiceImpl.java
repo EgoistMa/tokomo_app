@@ -33,8 +33,6 @@ public class GameServiceImpl implements GameService {
 
     @Autowired
     private GameService self; // 自我注入
-    @Autowired
-    private GameService gameService;
 
     @Override
     public Optional<Game> getGameById(Long id) {
