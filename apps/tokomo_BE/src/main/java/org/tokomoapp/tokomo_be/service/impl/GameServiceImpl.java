@@ -139,7 +139,7 @@ public class GameServiceImpl implements GameService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Game mergeGameInNewTransaction(Game newGame) {
 
-        Optional<Game> existGame = gameService.getGameByGameName(newGame.getGameName());
+        Optional<Game> existGame = self.getGameByGameName(newGame.getGameName());
 
         if (existGame.isPresent()) {
             existGame.get().setGameType(newGame.getGameType());
