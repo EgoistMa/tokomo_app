@@ -127,7 +127,14 @@ public class GameServiceImpl implements GameService {
                     gameRepository.save(existingGame.get());
                     mergedGames.add(existingGame.get());
                 }else {
-                    gameRepository.save(newGame);
+                    Game game = new Game();
+                    game.setGameName(newGame.getGameName());
+                    game.setGameType(newGame.getGameType());
+                    game.setDownloadUrl(newGame.getDownloadUrl());
+                    game.setPassword(newGame.getPassword());
+                    game.setExtractPassword(newGame.getExtractPassword());
+                    game.setNote(newGame.getNote());
+                    gameRepository.save(game);
                     mergedGames.add(newGame);
                 }
             } catch (Exception e) {
