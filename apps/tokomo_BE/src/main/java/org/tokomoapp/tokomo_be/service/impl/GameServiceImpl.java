@@ -31,9 +31,6 @@ public class GameServiceImpl implements GameService {
     @Autowired
     private UserGameRepository userGameRepository;
 
-    @Autowired
-    private GameService self; // 自我注入
-
     @Override
     public Optional<Game> getGameById(Long id) {
         return gameRepository.findById(id);
@@ -114,18 +111,23 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<Game> mergeGames(List<Game> newGames) {
         List<Game> mergedGames = new ArrayList<>();
-        Set<String> processedNames = new HashSet<>();  // 用于记录已处理的游戏名
         
         for (Game newGame : newGames) {
             try {
-                if (!processedNames.contains(newGame.getGameName())) {
-                    Game merged = self.mergeGameInNewTransaction(newGame);
-                    if (merged != null) {
-                        mergedGames.add(merged);
-                        processedNames.add(merged.getGameName());
-                    }
+                Optional<Game> existingGame = gameRepository.findByGameName(newGame.getGameName());
+                if (existingGame.isPresent()) {
+                    existingGame.get().setGameType(newGame.getGameType());
+                    existingGame.get().setDownloadUrl(newGame.getDownloadUrl());
+                    existingGame.get().setPassword(newGame.getPassword());
+                    existingGame.get().setExtractPassword(newGame.getExtractPassword());
+                    existingGame.get().setNote(newGame.getNote());
+                    gameRepository.save(existingGame.get());
+                    mergedGames.add(existingGame.get());
+                }else {
+                    mergedGames.add(newGame);
                 }
             } catch (Exception e) {
                 logger.error("处理游戏 [id={}，name={}] 时出错: {}", 
@@ -134,23 +136,6 @@ public class GameServiceImpl implements GameService {
         }
         
         return mergedGames;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Game mergeGameInNewTransaction(Game newGame) {
-
-        Optional<Game> existGame = self.getGameByGameName(newGame.getGameName());
-
-        if (existGame.isPresent()) {
-            existGame.get().setGameType(newGame.getGameType());
-            existGame.get().setDownloadUrl(newGame.getDownloadUrl());
-            existGame.get().setPassword(newGame.getPassword());
-            existGame.get().setExtractPassword(newGame.getExtractPassword());
-            existGame.get().setNote(newGame.getNote());
-            return gameRepository.save(existGame.get());
-        }else{
-            return gameRepository.save(newGame);
-        }
     }
 }
 

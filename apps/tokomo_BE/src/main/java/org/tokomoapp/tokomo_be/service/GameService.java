@@ -17,6 +17,4 @@ public interface GameService {
     void deleteGame(Long gameId);
     void deleteAllGames();
     List<Game> mergeGames(List<Game> newGames);
-
-    Game mergeGameInNewTransaction(Game newGame);
 }
