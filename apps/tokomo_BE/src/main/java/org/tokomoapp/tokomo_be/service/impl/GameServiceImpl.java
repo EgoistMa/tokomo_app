@@ -127,6 +127,7 @@ public class GameServiceImpl implements GameService {
                     gameRepository.save(existingGame.get());
                     mergedGames.add(existingGame.get());
                 }else {
+                    gameRepository.save(newGame);
                     mergedGames.add(newGame);
                 }
             } catch (Exception e) {
