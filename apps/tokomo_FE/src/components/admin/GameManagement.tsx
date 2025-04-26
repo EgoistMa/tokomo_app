@@ -370,7 +370,7 @@ export function GameManagement() {
               onChange={(e) => setUploadMode(e.target.value as 'overwrite' | 'merge')}
               className="block w-full text-sm text-gray-700 border border-gray-300 rounded-md p-2 mt-2"
             >
-              <option value="overwrite">覆盖</option>
+              <option value="overwrite">覆盖(尽量使用合并)</option>
               <option value="merge">合并</option>
             </select>
             <div className="flex justify-end space-x-4 mt-6">
