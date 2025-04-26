@@ -1,5 +1,6 @@
 package org.tokomoapp.tokomo_be.service.impl;
 
+import org.springframework.transaction.annotation.Propagation;
 import org.tokomoapp.tokomo_be.model.Game;
 import org.tokomoapp.tokomo_be.repository.GameRepository;
 import org.tokomoapp.tokomo_be.repository.UserGameRepository;
@@ -29,6 +30,11 @@ public class GameServiceImpl implements GameService {
 
     @Autowired
     private UserGameRepository userGameRepository;
+
+    @Autowired
+    private GameService self; // 自我注入
+    @Autowired
+    private GameService gameService;
 
     @Override
     public Optional<Game> getGameById(Long id) {
@@ -110,58 +116,18 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional
     public List<Game> mergeGames(List<Game> newGames) {
         List<Game> mergedGames = new ArrayList<>();
         Set<String> processedNames = new HashSet<>();  // 用于记录已处理的游戏名
         
         for (Game newGame : newGames) {
             try {
-                // 检查是否已经处理过相同名字的游戏
-                if (processedNames.contains(newGame.getGameName())) {
-                    logger.warn("跳过游戏 [id={}，name={}]，因为已存在同名游戏", 
-                        newGame.getId(), newGame.getGameName());
-                    continue;
-                }
-
-                // 先检查ID是否存在
-                Optional<Game> existingGameById = gameRepository.findById(newGame.getId());
-                if (existingGameById.isPresent()) {
-                    Game existingGame = existingGameById.get();
-                    // 如果ID存在且名字相同，则更新
-                    if (existingGame.getGameName().equals(newGame.getGameName())) {
-                        existingGame.setGameType(newGame.getGameType());
-                        existingGame.setDownloadUrl(newGame.getDownloadUrl());
-                        existingGame.setPassword(newGame.getPassword());
-                        existingGame.setExtractPassword(newGame.getExtractPassword());
-                        existingGame.setNote(newGame.getNote());
-                        mergedGames.add(gameRepository.save(existingGame));
-                        processedNames.add(existingGame.getGameName());
-                        logger.info("更新游戏 [id={}，name={}]", existingGame.getId(), existingGame.getGameName());
-                    } else {
-                        logger.warn("跳过游戏 [id={}，name={}]，因为ID存在但名字不同", 
-                            newGame.getId(), newGame.getGameName());
+                if (!processedNames.contains(newGame.getGameName())) {
+                    Game merged = self.mergeGameInNewTransaction(newGame);
+                    if (merged != null) {
+                        mergedGames.add(merged);
+                        processedNames.add(merged.getGameName());
                     }
-                    continue;
-                }
-                
-                // 如果ID不存在，检查名字是否存在
-                Optional<Game> existingGameByName = gameRepository.findByGameName(newGame.getGameName());
-                if (existingGameByName.isPresent()) {
-                    Game existingGame = existingGameByName.get();
-                    existingGame.setGameType(newGame.getGameType());
-                    existingGame.setDownloadUrl(newGame.getDownloadUrl());
-                    existingGame.setPassword(newGame.getPassword());
-                    existingGame.setExtractPassword(newGame.getExtractPassword());
-                    existingGame.setNote(newGame.getNote());
-                    mergedGames.add(gameRepository.save(existingGame));
-                    processedNames.add(existingGame.getGameName());
-                    logger.info("更新游戏 [id={}，name={}]", existingGame.getId(), existingGame.getGameName());
-                } else {
-                    // 如果既没有相同ID也没有相同名字，则添加为新游戏
-                    mergedGames.add(gameRepository.save(newGame));
-                    processedNames.add(newGame.getGameName());
-                    logger.info("添加新游戏 [id={}，name={}]", newGame.getId(), newGame.getGameName());
                 }
             } catch (Exception e) {
                 logger.error("处理游戏 [id={}，name={}] 时出错: {}", 
@@ -170,6 +136,23 @@ public class GameServiceImpl implements GameService {
         }
         
         return mergedGames;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Game mergeGameInNewTransaction(Game newGame) {
+
+        Optional<Game> existGame = gameService.getGameByGameName(newGame.getGameName());
+
+        if (existGame.isPresent()) {
+            existGame.get().setGameType(newGame.getGameType());
+            existGame.get().setDownloadUrl(newGame.getDownloadUrl());
+            existGame.get().setPassword(newGame.getPassword());
+            existGame.get().setExtractPassword(newGame.getExtractPassword());
+            existGame.get().setNote(newGame.getNote());
+            return gameRepository.save(existGame.get());
+        }else{
+            return gameRepository.save(newGame);
+        }
     }
 }
 
