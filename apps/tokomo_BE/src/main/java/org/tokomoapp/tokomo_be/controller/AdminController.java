@@ -343,14 +343,13 @@ public class AdminController {
 
             List<Game> skippedGames = new ArrayList<>();
             if ("overwrite".equals(mode)) {
-                List<Game> allGames = gameService.getAllGames();
-                for (Game game : allGames) {
-                    if (userGameRepository.existsByGameId(game.getId())) {
-                        skippedGames.add(game);
+                for (Game game : newGames) {
+                    if(gameService.getGameById(game.getId()).isPresent()) {
+                        gameService.updateGame(game.getId(), game);
+                    }else {
+                        gameService.saveGame(game);
                     }
                 }
-                gameService.deleteAllGames();
-                gameService.saveGames(newGames);
             } else if ("merge".equals(mode)) {
                 List<Game> mergedGames = gameService.mergeGames(newGames);
                 newGames = mergedGames;
